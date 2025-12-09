@@ -9,7 +9,6 @@ const programs = [
     duration: "8 Weeks",
     rating: "4.9",
     level: "Beginner",
-    gradient: "from-coral to-accent",
   },
   {
     title: "HIIT Revolution",
@@ -17,7 +16,6 @@ const programs = [
     duration: "6 Weeks",
     rating: "4.8",
     level: "Intermediate",
-    gradient: "from-primary to-coral",
   },
   {
     title: "Mindful Movement",
@@ -25,7 +23,6 @@ const programs = [
     duration: "4 Weeks",
     rating: "4.9",
     level: "All Levels",
-    gradient: "from-sage to-primary",
   },
 ];
 
@@ -40,10 +37,10 @@ export function Programs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <span className="text-primary font-medium text-sm uppercase tracking-wider">
+            <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
               Programs
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mt-2">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-light text-foreground mt-4">
               Structured plans for results
             </h2>
             <p className="text-muted-foreground mt-4 max-w-lg">
@@ -57,7 +54,7 @@ export function Programs() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <Button variant="soft" className="group">
+            <Button variant="ghost" className="group text-xs uppercase tracking-widest">
               Browse All Programs
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Button>
@@ -73,46 +70,41 @@ export function Programs() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="group relative overflow-hidden rounded-2xl bg-card p-6 md:p-8 shadow-card hover:shadow-elevated transition-all duration-500"
+              className="group relative overflow-hidden bg-card p-8 border border-border hover:border-foreground/20 transition-all duration-500"
             >
-              {/* Gradient Accent */}
-              <div
-                className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${program.gradient}`}
-              />
-
               {/* Level Badge */}
-              <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs font-medium mb-4">
+              <div className="inline-flex items-center gap-1 px-3 py-1 bg-secondary text-muted-foreground text-xs uppercase tracking-widest mb-6">
                 {program.level}
               </div>
 
               {/* Title */}
-              <h3 className="text-xl md:text-2xl font-bold text-card-foreground mb-3 group-hover:text-primary transition-colors">
+              <h3 className="text-xl md:text-2xl font-serif text-card-foreground mb-4">
                 {program.title}
               </h3>
 
               {/* Description */}
-              <p className="text-muted-foreground mb-6">
+              <p className="text-muted-foreground text-sm mb-8 leading-relaxed">
                 {program.description}
               </p>
 
               {/* Meta */}
-              <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center gap-1.5 text-sm">
+              <div className="flex items-center gap-6 mb-8">
+                <div className="flex items-center gap-2 text-sm">
                   <Clock className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-foreground font-medium">
+                  <span className="text-foreground">
                     {program.duration}
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 text-sm">
-                  <Star className="w-4 h-4 text-coral fill-current" />
-                  <span className="text-foreground font-medium">
+                <div className="flex items-center gap-2 text-sm">
+                  <Star className="w-4 h-4 text-foreground" />
+                  <span className="text-foreground">
                     {program.rating}
                   </span>
                 </div>
               </div>
 
               {/* CTA */}
-              <Button variant="outline" className="w-full group/btn">
+              <Button variant="outline" className="w-full group/btn text-xs uppercase tracking-widest">
                 Start Program
                 <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
               </Button>

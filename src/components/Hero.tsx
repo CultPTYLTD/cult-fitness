@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Play, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-fitness.jpg";
 
@@ -14,36 +14,33 @@ export function Hero() {
           className="w-full h-full object-cover"
         />
         <div 
-          className="absolute inset-0"
-          style={{ background: "var(--gradient-hero-overlay)" }}
+          className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-transparent"
         />
       </div>
 
       {/* Content */}
       <div className="container relative z-10 pt-20">
-        <div className="max-w-2xl">
+        <div className="max-w-xl">
           {/* Badge */}
-          <motion.div
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 rounded-full px-4 py-2 mb-6"
+            className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-8"
           >
-            <Sparkles className="w-4 h-4 text-coral-light" />
-            <span className="text-primary-foreground/90 text-sm font-medium">
-              Join 500k+ women transforming their lives
-            </span>
-          </motion.div>
+            The modern fitness collective
+          </motion.p>
 
           {/* Heading */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="text-4xl md:text-6xl lg:text-7xl font-bold text-primary-foreground mb-6 leading-tight"
+            className="text-5xl md:text-7xl lg:text-8xl font-serif font-light text-foreground mb-8 leading-[0.95]"
           >
-            Move Your Body,{" "}
-            <span className="text-coral-light">Transform</span> Your Life
+            Move with
+            <br />
+            <span className="italic">intention</span>
           </motion.h1>
 
           {/* Description */}
@@ -51,10 +48,10 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="text-lg md:text-xl text-primary-foreground/80 mb-8 max-w-lg"
+            className="text-base text-muted-foreground mb-10 max-w-md leading-relaxed"
           >
-            Personalized workouts, nutrition plans, and a supportive community 
-            to help you become the strongest version of yourself.
+            Curated workouts, mindful movement, and a community dedicated 
+            to becoming the best version of yourself.
           </motion.p>
 
           {/* CTAs */}
@@ -64,13 +61,12 @@ export function Hero() {
             transition={{ delay: 0.5 }}
             className="flex flex-col sm:flex-row gap-4"
           >
-            <Button variant="coral" size="xl" className="group">
-              Start Your Journey
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <Button size="lg" className="group text-xs uppercase tracking-widest">
+              Begin Your Journey
+              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button variant="hero" size="xl" className="group">
-              <Play className="w-5 h-5 fill-current" />
-              Watch Demo
+            <Button variant="outline" size="lg" className="text-xs uppercase tracking-widest">
+              Explore Programs
             </Button>
           </motion.div>
 
@@ -79,18 +75,18 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="flex gap-8 mt-12 pt-8 border-t border-primary-foreground/20"
+            className="flex gap-12 mt-16 pt-8 border-t border-border/50"
           >
             {[
               { value: "500+", label: "Workouts" },
               { value: "50+", label: "Programs" },
-              { value: "4.9", label: "App Rating" },
+              { value: "100k+", label: "Members" },
             ].map((stat) => (
               <div key={stat.label}>
-                <div className="text-2xl md:text-3xl font-bold text-primary-foreground">
+                <div className="text-2xl md:text-3xl font-serif font-light text-foreground">
                   {stat.value}
                 </div>
-                <div className="text-sm text-primary-foreground/60">
+                <div className="text-xs uppercase tracking-widest text-muted-foreground mt-1">
                   {stat.label}
                 </div>
               </div>

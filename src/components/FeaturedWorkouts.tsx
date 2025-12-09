@@ -49,10 +49,10 @@ export function FeaturedWorkouts() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <span className="text-primary font-medium text-sm uppercase tracking-wider">
+            <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
               Featured Workouts
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mt-2">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-light text-foreground mt-4">
               Train with purpose
             </h2>
             <p className="text-muted-foreground mt-4 max-w-lg">
@@ -66,7 +66,7 @@ export function FeaturedWorkouts() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <Button variant="soft" className="group">
+            <Button variant="ghost" className="group text-xs uppercase tracking-widest">
               View All Workouts
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Button>

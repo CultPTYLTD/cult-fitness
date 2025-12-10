@@ -1,10 +1,15 @@
 import { MobileLayout } from "@/components/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function Membership() {
   const navigate = useNavigate();
+
+  const handlePauseMembership = () => {
+    toast.info("Pause membership feature coming soon");
+  };
 
   return (
     <MobileLayout showNav={false}>
@@ -26,14 +31,19 @@ export default function Membership() {
           <p className="text-muted-foreground mb-4">Renews on December 19, 2025</p>
 
           <div className="bg-foreground text-background rounded-xl p-4 mb-4">
-            <span className="font-medium">Monthly Subscription</span>
+            <span className="font-medium">Monthly Subscription - R250/month</span>
           </div>
 
-          <button className="w-full text-center text-red-500 font-medium py-3 border-b border-border/30">
-            MANAGE SUBSCRIPTION
-          </button>
+          <Link to="/subscribe">
+            <button className="w-full text-center text-red-500 font-medium py-3 border-b border-border/30">
+              MANAGE SUBSCRIPTION
+            </button>
+          </Link>
           
-          <button className="w-full text-center text-foreground font-medium py-3 border-b border-border/30">
+          <button 
+            className="w-full text-center text-foreground font-medium py-3 border-b border-border/30"
+            onClick={handlePauseMembership}
+          >
             PAUSE MEMBERSHIP
           </button>
 

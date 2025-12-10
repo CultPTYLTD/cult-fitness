@@ -20,6 +20,9 @@ import Membership from "./pages/profile/Membership";
 import Help from "./pages/profile/Help";
 import Programs from "./pages/Programs";
 import OnDemand from "./pages/OnDemand";
+import Subscribe from "./pages/Subscribe";
+import SubscriptionSuccess from "./pages/SubscriptionSuccess";
+import SubscriptionCancel from "./pages/SubscriptionCancel";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +51,9 @@ const App = () => (
             <Route path="/profile/help" element={<Help />} />
             <Route path="/programs" element={<Programs />} />
             <Route path="/on-demand" element={<OnDemand />} />
+            <Route path="/subscribe" element={<Subscribe />} />
+            <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+            <Route path="/subscription/cancel" element={<SubscriptionCancel />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

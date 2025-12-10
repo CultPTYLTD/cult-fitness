@@ -9,34 +9,10 @@ import { useState } from "react";
 import heroImage from "@/assets/hero-fitness.jpg";
 import workoutYoga from "@/assets/workout-yoga.jpg";
 import workoutStrength from "@/assets/workout-strength.jpg";
-
-// Goal tracker items with background images
-const goalTrackerItems = [
-  { 
-    id: "water", 
-    label: "Water", 
-    value: 0, 
-    target: 2500, 
-    unit: "ml",
-    image: workoutYoga,
-  },
-  { 
-    id: "steps", 
-    label: "Steps", 
-    value: 0, 
-    target: 10000, 
-    unit: "",
-    image: workoutStrength,
-  },
-  { 
-    id: "sleep", 
-    label: "Sleep", 
-    value: 0, 
-    target: 8, 
-    unit: "hrs",
-    image: heroImage,
-  },
-];
+import { useGoals } from "@/contexts/GoalContext";
+import { HydrationModal } from "@/components/goals/HydrationModal";
+import { StepsModal } from "@/components/goals/StepsModal";
+import { SleepModal } from "@/components/goals/SleepModal";
 
 const featuredWorkouts = [
   {
@@ -65,9 +41,39 @@ const macros = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const { goals } = useGoals();
   const [activeTab, setActiveTab] = useState<"program" | "ondemand">("program");
   const [activeSlide, setActiveSlide] = useState(0);
+  const [activeModal, setActiveModal] = useState<"water" | "steps" | "sleep" | null>(null);
   
+  // Goal tracker items with background images
+  const goalTrackerItems = [
+    { 
+      id: "water" as const, 
+      label: "Water", 
+      value: goals.water, 
+      target: 2500, 
+      unit: "ml",
+      image: workoutYoga,
+    },
+    { 
+      id: "steps" as const, 
+      label: "Steps", 
+      value: goals.steps, 
+      target: 10000, 
+      unit: "",
+      image: workoutStrength,
+    },
+    { 
+      id: "sleep" as const, 
+      label: "Sleep", 
+      value: goals.sleep, 
+      target: 8, 
+      unit: "hrs",
+      image: heroImage,
+    },
+  ];
+
   // Calculate consumed calories (mock data - this would come from meals eaten)
   const consumedCalories = 1250;
   const targetCalories = 2360;
@@ -241,36 +247,40 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-3 gap-3">
             {goalTrackerItems.map((goal, index) => {
-              const progress = (goal.value / goal.target) * 100;
               return (
-                <Link to="/goals" key={goal.id}>
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.5 + index * 0.05 }}
-                    className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer group"
-                  >
-                    <img 
-                      src={goal.image} 
-                      alt={goal.label}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                    />
-                    <div className="absolute inset-0 bg-black/40" />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-2">
-                      <p className="text-xs font-medium mb-1">{goal.label}</p>
-                      <p className="text-xl font-semibold">
-                        {goal.value}
-                        <span className="text-xs font-normal ml-0.5">{goal.unit}</span>
-                      </p>
-                      <p className="text-xs opacity-80">of {goal.target}</p>
-                    </div>
-                  </motion.div>
-                </Link>
+                <motion.div
+                  key={goal.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.5 + index * 0.05 }}
+                  onClick={() => setActiveModal(goal.id)}
+                  className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer group"
+                >
+                  <img 
+                    src={goal.image} 
+                    alt={goal.label}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  />
+                  <div className="absolute inset-0 bg-black/40" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-2">
+                    <p className="text-xs font-medium mb-1">{goal.label}</p>
+                    <p className="text-xl font-semibold">
+                      {goal.value}
+                      <span className="text-xs font-normal ml-0.5">{goal.unit}</span>
+                    </p>
+                    <p className="text-xs opacity-80">of {goal.target}</p>
+                  </div>
+                </motion.div>
               );
             })}
           </div>
         </motion.div>
       </div>
+
+      {/* Goal Modals */}
+      <HydrationModal open={activeModal === "water"} onClose={() => setActiveModal(null)} />
+      <StepsModal open={activeModal === "steps"} onClose={() => setActiveModal(null)} />
+      <SleepModal open={activeModal === "sleep"} onClose={() => setActiveModal(null)} />
     </MobileLayout>
   );
 }

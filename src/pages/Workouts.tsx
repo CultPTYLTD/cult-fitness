@@ -230,7 +230,7 @@ export default function Workouts() {
             <Button 
               className="w-full rounded-full py-6 mb-6 uppercase tracking-wider"
               onClick={startWorkout}
-              variant="olive"
+              variant="default"
             >
               START WORKOUT
             </Button>

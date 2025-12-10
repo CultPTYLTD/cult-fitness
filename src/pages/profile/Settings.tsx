@@ -32,14 +32,14 @@ export default function Settings() {
             <h3 className="text-foreground font-semibold mb-3">Body Measurements</h3>
             <div className="flex gap-3">
               <Button
-                variant={settings.bodyMeasurements === "metric" ? "olive" : "outline"}
+                variant={settings.bodyMeasurements === "metric" ? "default" : "outline"}
                 className="flex-1 rounded-full"
                 onClick={() => setSettings({...settings, bodyMeasurements: "metric"})}
               >
                 Metric
               </Button>
               <Button
-                variant={settings.bodyMeasurements === "us" ? "olive" : "outline"}
+                variant={settings.bodyMeasurements === "us" ? "default" : "outline"}
                 className="flex-1 rounded-full"
                 onClick={() => setSettings({...settings, bodyMeasurements: "us"})}
               >
@@ -56,14 +56,14 @@ export default function Settings() {
             <h3 className="text-foreground font-semibold mb-3">Nutrition Measurements</h3>
             <div className="flex gap-3">
               <Button
-                variant={settings.nutritionMeasurements === "metric" ? "olive" : "outline"}
+                variant={settings.nutritionMeasurements === "metric" ? "default" : "outline"}
                 className="flex-1 rounded-full"
                 onClick={() => setSettings({...settings, nutritionMeasurements: "metric"})}
               >
                 Metric
               </Button>
               <Button
-                variant={settings.nutritionMeasurements === "us" ? "olive" : "outline"}
+                variant={settings.nutritionMeasurements === "us" ? "default" : "outline"}
                 className="flex-1 rounded-full"
                 onClick={() => setSettings({...settings, nutritionMeasurements: "us"})}
               >
@@ -170,13 +170,13 @@ export default function Settings() {
           <div className="mb-8">
             <h3 className="text-foreground font-semibold mb-3">Reboot Options</h3>
             <div className="space-y-3">
-              <Button variant="olive" className="w-full rounded-full">
+              <Button variant="default" className="w-full rounded-full">
                 REBOOT MY WORKOUTS
               </Button>
-              <Button variant="olive" className="w-full rounded-full">
+              <Button variant="default" className="w-full rounded-full">
                 REBOOT MY MEALS
               </Button>
-              <Button variant="olive" className="w-full rounded-full">
+              <Button variant="default" className="w-full rounded-full">
                 RESTART PROGRAM
               </Button>
             </div>

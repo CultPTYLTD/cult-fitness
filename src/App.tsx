@@ -11,6 +11,12 @@ import RecipeDetail from "./pages/RecipeDetail";
 import Tracking from "./pages/Tracking";
 import Goals from "./pages/Goals";
 import Profile from "./pages/Profile";
+import EditProfile from "./pages/profile/EditProfile";
+import Settings from "./pages/profile/Settings";
+import UpdateMacros from "./pages/profile/UpdateMacros";
+import ProgressPhotos from "./pages/profile/ProgressPhotos";
+import Membership from "./pages/profile/Membership";
+import Help from "./pages/profile/Help";
 import Programs from "./pages/Programs";
 import OnDemand from "./pages/OnDemand";
 import NotFound from "./pages/NotFound";
@@ -32,6 +38,12 @@ const App = () => (
           <Route path="/tracking" element={<Tracking />} />
           <Route path="/goals" element={<Goals />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/account" element={<EditProfile />} />
+          <Route path="/profile/settings" element={<Settings />} />
+          <Route path="/profile/macros" element={<UpdateMacros />} />
+          <Route path="/profile/photos" element={<ProgressPhotos />} />
+          <Route path="/profile/membership" element={<Membership />} />
+          <Route path="/profile/help" element={<Help />} />
           <Route path="/programs" element={<Programs />} />
           <Route path="/on-demand" element={<OnDemand />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

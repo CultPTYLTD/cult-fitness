@@ -38,6 +38,19 @@ serve(async (req) => {
 
     console.log('Received PayFast ITN:', JSON.stringify(data));
 
+    // Verify PayFast signature
+    const signature = data.signature;
+    if (!signature) {
+      console.error('Missing PayFast signature');
+      return new Response('Missing signature', { status: 400 });
+    }
+
+    const isValidSignature = await verifySignature(data, signature);
+    if (!isValidSignature) {
+      console.error('Invalid PayFast signature');
+      return new Response('Invalid signature', { status: 400 });
+    }
+
     // Verify merchant ID
     if (data.merchant_id !== PAYFAST_MERCHANT_ID) {
       console.error('Invalid merchant ID');

@@ -121,7 +121,7 @@ export default function Home() {
             Pregnancy Trimester 1
           </h3>
           <Link to="/workouts">
-            <Button className="w-full bg-olive hover:bg-olive-dark text-white rounded-full py-6 uppercase tracking-wider text-sm font-medium">
+            <Button className="w-full bg-foreground hover:bg-foreground/80 text-background rounded-full py-6 uppercase tracking-wider text-sm font-medium">
               Today's Workout
             </Button>
           </Link>

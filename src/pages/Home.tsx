@@ -109,7 +109,7 @@ export default function Home() {
               </h2>
               <Button
                 variant="secondary"
-                className="bg-olive hover:bg-olive-dark text-white border-0 rounded-full px-8 uppercase tracking-wider text-sm"
+                className="bg-foreground hover:bg-foreground/80 text-background border-0 rounded-full px-8 uppercase tracking-wider text-sm"
               >
                 Learn More
               </Button>

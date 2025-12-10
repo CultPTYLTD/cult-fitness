@@ -49,13 +49,13 @@ export default function Home() {
           >
             <h1 className="text-xl tracking-[0.3em] font-serif">
               <span className="font-bold">CULT</span>
-              <span className="font-light">.CRUSH</span>
+              <span className="font-light"> FITNESS</span>
             </h1>
           </motion.div>
           <Avatar className="h-12 w-12 border-2 border-primary/20">
             <AvatarImage src="" />
             <AvatarFallback className="bg-secondary text-foreground font-medium">
-              CC
+              CF
             </AvatarFallback>
           </Avatar>
         </div>

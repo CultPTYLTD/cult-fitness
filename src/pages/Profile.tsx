@@ -21,14 +21,14 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 
 const menuItems = [
-  { icon: Crown, label: "Manage My Membership", description: "Renews on December 19, 2025", link: "#" },
-  { icon: User, label: "My Account", description: "Update your personal information", link: "#" },
-  { icon: Settings, label: "Settings", description: "Update settings and preferences", link: "#" },
-  { icon: CircleDot, label: "Update My Macros", description: "Update your goal, restrictions and calories", link: "#" },
-  { icon: ImageIcon, label: "My Progress", description: "Compare your progress pictures", link: "/tracking" },
+  { icon: Crown, label: "Manage My Membership", description: "Renews on December 19, 2025", link: "/profile/membership" },
+  { icon: User, label: "My Account", description: "Update your personal information", link: "/profile/account" },
+  { icon: Settings, label: "Settings", description: "Update settings and preferences", link: "/profile/settings" },
+  { icon: CircleDot, label: "Update My Macros", description: "Update your goal, restrictions and calories", link: "/profile/macros" },
+  { icon: ImageIcon, label: "My Progress", description: "Compare your progress pictures", link: "/profile/progress" },
   { icon: Podcast, label: "Podcasts", description: "Listen to behind the scenes updates", link: "#" },
   { icon: Facebook, label: "Join Our Facebook Group", description: "Share your journey with the community", link: "#" },
-  { icon: MessageCircle, label: "Chat With Us", description: "Get in touch with us now", link: "#" },
+  { icon: MessageCircle, label: "Chat With Us", description: "Get in touch with us now", link: "/profile/help" },
   { icon: FileText, label: "Terms and Conditions", description: "Terms and Conditions documentation", link: "#" },
   { icon: Shield, label: "Privacy Policy", description: "Privacy Policy documentation", link: "#" },
   { icon: Trash2, label: "Delete Account", description: "Delete all your data", link: "#" },

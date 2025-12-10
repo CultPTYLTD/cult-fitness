@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["'Inter'", "sans-serif"],
-        serif: ["'Cormorant Garamond'", "serif"],
+        sans: ["'Lato'", "sans-serif"],
+        serif: ["'Libre Bodoni'", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -60,6 +60,10 @@ export default {
         taupe: "hsl(var(--taupe))",
         espresso: "hsl(var(--espresso))",
         nude: "hsl(var(--nude))",
+        olive: {
+          DEFAULT: "hsl(var(--olive))",
+          dark: "hsl(var(--olive-dark))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

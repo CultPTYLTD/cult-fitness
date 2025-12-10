@@ -1,148 +1,186 @@
 import { MobileLayout } from "@/components/MobileLayout";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Play, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import heroImage from "@/assets/hero-fitness.jpg";
+import { cn } from "@/lib/utils";
 
-const todayWorkout = {
-  title: "Full Body Sculpt",
-  duration: "35 min",
-  calories: "280 cal",
-  level: "Intermediate",
-};
+const featuredWorkouts = [
+  {
+    id: 1,
+    title: "10 Minutes to Toned Arms",
+    image: heroImage,
+  },
+  {
+    id: 2,
+    title: "Full Body Burn",
+    image: heroImage,
+  },
+  {
+    id: 3,
+    title: "Core Strength",
+    image: heroImage,
+  },
+];
 
-const quickStats = [
-  { label: "Day Streak", value: "12" },
-  { label: "This Week", value: "4/5" },
-  { label: "Calories", value: "1,247" },
+const macros = [
+  { label: "Protein", value: 0 },
+  { label: "Fats", value: 0 },
+  { label: "Carbs", value: 0 },
+  { label: "Fibre", value: 0 },
 ];
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState<"program" | "ondemand">("program");
+  const [activeSlide, setActiveSlide] = useState(0);
+
   return (
     <MobileLayout>
-      <div className="px-4 pt-12 pb-8">
+      <div className="px-4 pt-6 pb-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-4">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <p className="text-muted-foreground text-sm">Good morning</p>
-            <h1 className="text-2xl font-serif font-light text-foreground">
-              Welcome back
+            <h1 className="text-xl tracking-[0.3em] font-serif">
+              <span className="font-bold">CULT</span>
+              <span className="font-light">.CRUSH</span>
             </h1>
           </motion.div>
           <Avatar className="h-12 w-12 border-2 border-primary/20">
+            <AvatarImage src="" />
             <AvatarFallback className="bg-secondary text-foreground font-medium">
-              CF
+              CC
             </AvatarFallback>
           </Avatar>
         </div>
 
-        {/* Quick Stats */}
+        {/* Tab Switcher */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-3 gap-3 mb-8"
+          className="flex bg-secondary/50 rounded-full p-1 mb-6"
         >
-          {quickStats.map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-secondary/50 rounded-2xl p-4 text-center"
-            >
-              <div className="text-2xl font-serif font-light text-foreground">
-                {stat.value}
-              </div>
-              <p className="text-xs text-muted-foreground">{stat.label}</p>
-            </div>
-          ))}
+          <button
+            onClick={() => setActiveTab("program")}
+            className={`flex-1 py-2.5 px-4 rounded-full text-sm font-medium transition-all ${
+              activeTab === "program"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground"
+            }`}
+          >
+            My Program
+          </button>
+          <button
+            onClick={() => setActiveTab("ondemand")}
+            className={`flex-1 py-2.5 px-4 rounded-full text-sm font-medium transition-all ${
+              activeTab === "ondemand"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground"
+            }`}
+          >
+            On-Demand
+          </button>
         </motion.div>
 
-        {/* Today's Workout */}
+        {/* Featured Workout Carousel */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-8"
+          className="mb-6"
         >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-serif font-light text-foreground">
-              Today's Workout
-            </h2>
-            <Link to="/workouts">
-              <Button variant="ghost" size="sm" className="text-muted-foreground">
-                View all <ChevronRight className="w-4 h-4 ml-1" />
+          <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
+            <img
+              src={featuredWorkouts[activeSlide].image}
+              alt={featuredWorkouts[activeSlide].title}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6">
+              <h2 className="text-2xl font-serif text-center leading-tight mb-4">
+                {featuredWorkouts[activeSlide].title}
+              </h2>
+              <Button
+                variant="secondary"
+                className="bg-olive hover:bg-olive-dark text-white border-0 rounded-full px-8 uppercase tracking-wider text-sm"
+              >
+                Learn More
               </Button>
-            </Link>
-          </div>
-          <div className="bg-card rounded-2xl overflow-hidden border border-border/50">
-            <div className="relative h-48 bg-gradient-to-br from-secondary to-muted">
-              <button className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 bg-background/90 rounded-full flex items-center justify-center">
-                  <Play className="w-6 h-6 text-foreground ml-1" />
-                </div>
-              </button>
             </div>
-            <div className="p-5">
-              <h3 className="font-semibold text-foreground text-lg mb-2">
-                {todayWorkout.title}
-              </h3>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                <span>{todayWorkout.duration}</span>
-                <span>•</span>
-                <span>{todayWorkout.calories}</span>
-                <span>•</span>
-                <span>{todayWorkout.level}</span>
-              </div>
-              <Button className="w-full">Start Workout</Button>
+            {/* Carousel Dots */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+              {featuredWorkouts.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveSlide(idx)}
+                  className={`h-2 rounded-full transition-all ${
+                    idx === activeSlide
+                      ? "w-6 bg-white"
+                      : "w-2 bg-white/50"
+                  }`}
+                />
+              ))}
             </div>
           </div>
         </motion.div>
 
-        {/* Weekly Progress */}
+        {/* Today's Workout Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mb-8"
+          className="mb-6"
         >
-          <h2 className="text-xl font-serif font-light text-foreground mb-4">
-            Weekly Progress
-          </h2>
-          <div className="bg-card rounded-2xl p-5 border border-border/50">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-foreground">Workouts completed</span>
-              <span className="text-foreground font-semibold">4 of 5</span>
-            </div>
-            <Progress value={80} className="h-2 mb-4" />
-            <p className="text-sm text-muted-foreground">
-              Great progress! Just 1 more workout to hit your weekly goal.
-            </p>
-          </div>
+          <h3 className="text-lg font-semibold text-foreground mb-3">
+            Pregnancy Trimester 1
+          </h3>
+          <Link to="/workouts">
+            <Button
+              className="w-full bg-olive hover:bg-olive-dark text-white rounded-full py-6 uppercase tracking-wider text-sm font-medium"
+            >
+              Today's Workout
+            </Button>
+          </Link>
         </motion.div>
 
-        {/* Quick Actions */}
+        {/* My Meals Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="grid grid-cols-2 gap-3"
+          className="mb-6"
         >
-          <Link to="/goals">
-            <Button variant="outline" className="w-full h-auto py-4 flex-col rounded-2xl">
-              <span className="text-lg mb-1">🎯</span>
-              <span>Daily Goals</span>
-            </Button>
-          </Link>
-          <Link to="/meals">
-            <Button variant="outline" className="w-full h-auto py-4 flex-col rounded-2xl">
-              <span className="text-lg mb-1">🥗</span>
-              <span>Meal Plans</span>
-            </Button>
-          </Link>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-lg font-semibold text-foreground">My Meals</h3>
+            <Link to="/meals">
+              <Button variant="ghost" size="sm" className="text-muted-foreground p-0">
+                <ChevronRight className="w-5 h-5" />
+              </Button>
+            </Link>
+          </div>
+          <p className="text-sm text-muted-foreground mb-2">Calorie Total</p>
+          <Progress value={0} className="h-2 mb-6 bg-secondary" />
+
+          {/* Macros */}
+          <div className="grid grid-cols-4 gap-3">
+            {macros.map((macro) => (
+              <div key={macro.label} className="flex flex-col items-center">
+                <div className="w-16 h-16 rounded-full border-2 border-secondary flex items-center justify-center mb-2">
+                  <span className="text-lg font-semibold text-foreground">
+                    {macro.value}
+                  </span>
+                </div>
+                <span className="text-xs text-muted-foreground">{macro.label}</span>
+              </div>
+            ))}
+          </div>
         </motion.div>
       </div>
     </MobileLayout>

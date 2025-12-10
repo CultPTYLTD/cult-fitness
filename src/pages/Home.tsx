@@ -118,7 +118,7 @@ export default function Home() {
         delay: 0.3
       }} className="mb-6">
           <h3 className="text-lg font-semibold text-foreground mb-3">
-            Pregnancy Trimester 1
+            PREGNANCY TRIMESTER 1   
           </h3>
           <Link to="/workouts">
             <Button className="w-full bg-foreground hover:bg-foreground/80 text-background rounded-full py-6 uppercase tracking-wider text-sm font-medium">

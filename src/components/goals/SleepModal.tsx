@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { X } from "lucide-react";
 import { toast } from "sonner";
+import { useGoals } from "@/contexts/GoalContext";
 
 interface SleepModalProps {
   open: boolean;
@@ -11,18 +12,20 @@ interface SleepModalProps {
 }
 
 export function SleepModal({ open, onClose }: SleepModalProps) {
-  const [sleepHours, setSleepHours] = useState(7);
+  const { goals, updateGoal } = useGoals();
+  const [sleepHours, setSleepHours] = useState(goals.sleep || 7);
   const weekData = [8, 7.5, 6, 7, 8, 0, 0];
   const averageSleep = weekData.filter(h => h > 0).reduce((a, b) => a + b, 0) / weekData.filter(h => h > 0).length || 0;
 
   const handleSave = () => {
+    updateGoal("sleep", sleepHours);
     toast.success(`Sleep logged: ${sleepHours} hours`);
     onClose();
   };
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="p-0 gap-0 max-w-md border-0 overflow-hidden bg-background max-h-[90vh] overflow-y-auto">
+      <DialogContent className="p-0 gap-0 max-w-md border-0 overflow-hidden bg-background max-h-[90vh] overflow-y-auto [&>button]:hidden">
         <div className="flex items-center justify-between p-4 border-b border-border">
           <Button variant="ghost" size="icon" onClick={onClose}><X className="w-5 h-5" /></Button>
           <span className="font-medium text-foreground">SLEEP TRACKING</span>

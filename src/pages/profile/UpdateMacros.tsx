@@ -106,7 +106,7 @@ export default function UpdateMacros() {
 
         {/* Update Button */}
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-background">
-          <Button variant="olive" className="w-full rounded-full">
+          <Button variant="default" className="w-full rounded-full">
             UPDATE MACROS
           </Button>
         </div>

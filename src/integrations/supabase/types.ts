@@ -173,6 +173,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_plan_purchases: {
+        Row: {
+          amount_paid: number
+          expires_at: string
+          id: string
+          is_active: boolean | null
+          payment_id: string | null
+          plan_name: string
+          plan_type: string
+          purchased_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_paid: number
+          expires_at: string
+          id?: string
+          is_active?: boolean | null
+          payment_id?: string | null
+          plan_name: string
+          plan_type: string
+          purchased_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_paid?: number
+          expires_at?: string
+          id?: string
+          is_active?: boolean | null
+          payment_id?: string | null
+          plan_name?: string
+          plan_type?: string
+          purchased_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       workout_plans: {
         Row: {
           category: string | null

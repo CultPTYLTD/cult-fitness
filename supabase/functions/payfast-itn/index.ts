@@ -47,33 +47,67 @@ serve(async (req) => {
     // Get user info from custom fields
     const userId = data.custom_str1;
     const planType = data.custom_str2;
+    const planName = data.custom_str3 || null; // For one-time purchases
+    const accessWeeks = data.custom_int1 ? parseInt(data.custom_int1) : null; // For one-time purchases
     const paymentStatus = data.payment_status;
     const amount = parseFloat(data.amount_gross);
+    const paymentId = data.m_payment_id;
 
-    console.log('Processing payment for user:', userId, 'status:', paymentStatus);
+    console.log('Processing payment for user:', userId, 'status:', paymentStatus, 'planName:', planName);
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     if (paymentStatus === 'COMPLETE') {
-      // Calculate subscription expiry (1 month from now)
-      const expiresAt = new Date();
-      expiresAt.setMonth(expiresAt.getMonth() + 1);
+      // Check if this is a one-time plan purchase or subscription
+      const isOneTimePurchase = paymentId?.startsWith('plan-') && planName && accessWeeks;
 
-      // Update user subscription status
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          subscription_status: 'active',
-          subscription_expires_at: expiresAt.toISOString(),
-        })
-        .eq('user_id', userId);
+      if (isOneTimePurchase) {
+        // Handle one-time plan purchase
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + (accessWeeks * 7));
 
-      if (updateError) {
-        console.error('Error updating subscription:', updateError);
-        return new Response('Database error', { status: 500 });
+        const { error: insertError } = await supabase
+          .from('user_plan_purchases')
+          .insert({
+            user_id: userId,
+            plan_name: planName,
+            plan_type: planType,
+            amount_paid: amount,
+            expires_at: expiresAt.toISOString(),
+            payment_id: paymentId,
+            is_active: true,
+          });
+
+        if (insertError) {
+          console.error('Error inserting plan purchase:', insertError);
+          return new Response('Database error', { status: 500 });
+        }
+
+        console.log('Plan purchase recorded for user:', userId, 'plan:', planName, 'expires:', expiresAt);
+      } else {
+        // Handle subscription
+        const expiresAt = new Date();
+        if (planType === 'annual') {
+          expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+        } else {
+          expiresAt.setMonth(expiresAt.getMonth() + 1);
+        }
+
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            subscription_status: 'active',
+            subscription_expires_at: expiresAt.toISOString(),
+          })
+          .eq('user_id', userId);
+
+        if (updateError) {
+          console.error('Error updating subscription:', updateError);
+          return new Response('Database error', { status: 500 });
+        }
+
+        console.log('Subscription activated for user:', userId, 'expires:', expiresAt);
       }
-
-      console.log('Subscription activated for user:', userId, 'expires:', expiresAt);
     } else if (paymentStatus === 'CANCELLED') {
       // Handle cancellation
       const { error: updateError } = await supabase

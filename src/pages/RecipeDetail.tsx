@@ -1,141 +1,137 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MobileLayout } from "@/components/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Plus, Check, Clock, Users } from "lucide-react";
+import { ArrowLeft, Plus, Check, Clock, Users, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
-const recipes = {
-  "1": {
-    id: 1,
-    title: "Avocado Toast with Eggs",
-    category: "Breakfast",
-    time: "15 min",
-    servings: 2,
-    calories: 380,
-    protein: 18,
-    carbs: 32,
-    fat: 22,
-    fibre: 8,
-    image: "/placeholder.svg",
-    ingredients: [
-      "2 slices sourdough bread",
-      "1 ripe avocado",
-      "2 large eggs",
-      "1 tbsp olive oil",
-      "Salt and pepper to taste",
-      "Red pepper flakes (optional)",
-      "Fresh herbs (optional)",
-    ],
-    method: [
-      "Toast the sourdough bread until golden and crispy.",
-      "While bread is toasting, cut the avocado in half, remove the pit, and scoop the flesh into a bowl.",
-      "Mash the avocado with a fork, adding salt and pepper to taste.",
-      "Heat olive oil in a non-stick pan over medium heat.",
-      "Crack eggs into the pan and cook to your preference (sunny side up or over easy).",
-      "Spread the mashed avocado evenly on the toasted bread.",
-      "Top each slice with a fried egg.",
-      "Season with additional salt, pepper, and red pepper flakes if desired.",
-      "Garnish with fresh herbs and serve immediately.",
-    ],
-  },
-  "2": {
-    id: 2,
-    title: "Grilled Chicken Salad",
-    category: "Lunch",
-    time: "20 min",
-    servings: 2,
-    calories: 420,
-    protein: 42,
-    carbs: 18,
-    fat: 20,
-    fibre: 6,
-    image: "/placeholder.svg",
-    ingredients: [
-      "2 chicken breasts",
-      "Mixed salad greens",
-      "Cherry tomatoes",
-      "Cucumber",
-      "Red onion",
-      "Feta cheese",
-      "Olive oil and lemon dressing",
-    ],
-    method: [
-      "Season chicken breasts with salt, pepper, and herbs.",
-      "Grill chicken for 6-7 minutes each side until cooked through.",
-      "Let chicken rest for 5 minutes, then slice.",
-      "Arrange salad greens on plates.",
-      "Top with tomatoes, cucumber, and red onion.",
-      "Add sliced chicken on top.",
-      "Crumble feta cheese over the salad.",
-      "Drizzle with olive oil and lemon dressing.",
-    ],
-  },
-  "3": {
-    id: 3,
-    title: "Salmon with Vegetables",
-    category: "Dinner",
-    time: "30 min",
-    servings: 2,
-    calories: 520,
-    protein: 45,
-    carbs: 24,
-    fat: 28,
-    fibre: 7,
-    image: "/placeholder.svg",
-    ingredients: [
-      "2 salmon fillets",
-      "Broccoli florets",
-      "Asparagus",
-      "Cherry tomatoes",
-      "Garlic",
-      "Lemon",
-      "Olive oil",
-      "Fresh dill",
-    ],
-    method: [
-      "Preheat oven to 200°C (400°F).",
-      "Place salmon fillets on a baking sheet lined with parchment.",
-      "Arrange vegetables around the salmon.",
-      "Drizzle everything with olive oil and season with salt and pepper.",
-      "Add minced garlic and lemon slices.",
-      "Bake for 20-25 minutes until salmon is cooked through.",
-      "Garnish with fresh dill before serving.",
-    ],
-  },
-};
+interface Ingredient {
+  item: string;
+  amount: string;
+}
+
+interface MealPlan {
+  id: string;
+  name: string;
+  description: string | null;
+  calories: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fats_g: number | null;
+  fibre_g: number | null;
+  image_url: string | null;
+  meal_type: string | null;
+  recipe_instructions: string | null;
+  ingredients: unknown;
+}
 
 export default function RecipeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isAdded, setIsAdded] = useState(false);
+  const [recipe, setRecipe] = useState<MealPlan | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const recipe = recipes[id as keyof typeof recipes] || recipes["1"];
+  useEffect(() => {
+    if (id) {
+      fetchRecipe();
+    }
+  }, [id]);
+
+  const fetchRecipe = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('meal_plans')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (error) throw error;
+      setRecipe(data as MealPlan | null);
+    } catch (error) {
+      console.error('Error fetching recipe:', error);
+      toast.error('Failed to load recipe');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddToMeal = () => {
     setIsAdded(true);
     toast.success("Meal added!", {
-      description: `${recipe.title} has been logged to your meals.`,
+      description: `${recipe?.name} has been logged to your meals.`,
     });
   };
 
+  if (loading) {
+    return (
+      <MobileLayout showNav={false}>
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+        </div>
+      </MobileLayout>
+    );
+  }
+
+  if (!recipe) {
+    return (
+      <MobileLayout showNav={false}>
+        <div className="flex flex-col items-center justify-center min-h-screen p-4">
+          <p className="text-muted-foreground mb-4">Recipe not found</p>
+          <Button onClick={() => navigate(-1)}>Go Back</Button>
+        </div>
+      </MobileLayout>
+    );
+  }
+
   const macros = [
-    { label: "Protein", value: recipe.protein, unit: "g", color: "from-rose-400 to-rose-500" },
-    { label: "Carbs", value: recipe.carbs, unit: "g", color: "from-amber-400 to-orange-500" },
-    { label: "Fat", value: recipe.fat, unit: "g", color: "from-sky-400 to-blue-500" },
-    { label: "Fibre", value: recipe.fibre, unit: "g", color: "from-emerald-400 to-teal-500" },
+    { label: "Protein", value: recipe.protein_g || 0, unit: "g", color: "from-rose-400 to-rose-500" },
+    { label: "Carbs", value: recipe.carbs_g || 0, unit: "g", color: "from-amber-400 to-orange-500" },
+    { label: "Fat", value: recipe.fats_g || 0, unit: "g", color: "from-sky-400 to-blue-500" },
+    { label: "Fibre", value: recipe.fibre_g || 0, unit: "g", color: "from-emerald-400 to-teal-500" },
   ];
+
+  // Parse method steps from recipe_instructions
+  const methodSteps = recipe.recipe_instructions
+    ? recipe.recipe_instructions.split('\n').filter(step => step.trim())
+    : [];
+
+  // Parse ingredients - handle various formats
+  const parseIngredients = (): Ingredient[] => {
+    if (!recipe.ingredients) return [];
+    if (Array.isArray(recipe.ingredients)) return recipe.ingredients as Ingredient[];
+    if (typeof recipe.ingredients === 'string') {
+      try {
+        return JSON.parse(recipe.ingredients);
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+  
+  const ingredients = parseIngredients();
 
   return (
     <MobileLayout showNav={false}>
       <div className="min-h-screen bg-background">
         {/* Header Image */}
         <div className="relative h-64 bg-secondary">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-muted-foreground">Recipe Image</span>
-          </div>
+          {recipe.image_url ? (
+            <img 
+              src={recipe.image_url} 
+              alt={recipe.name} 
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-muted-foreground">Recipe Image</span>
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
           <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between">
             <Button
               variant="ghost"
@@ -155,24 +151,27 @@ export default function RecipeDetail() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-card rounded-2xl p-5 border border-border/50 shadow-soft"
           >
-            <span className="text-sm text-muted-foreground">{recipe.category}</span>
-            <h1 className="text-2xl font-serif text-foreground mt-1 mb-4">{recipe.title}</h1>
+            <span className="text-sm text-muted-foreground capitalize">{recipe.meal_type}</span>
+            <h1 className="text-2xl font-serif text-foreground mt-1 mb-2">{recipe.name}</h1>
+            {recipe.description && (
+              <p className="text-sm text-muted-foreground mb-4">{recipe.description}</p>
+            )}
 
             <div className="flex items-center gap-4 mb-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="w-4 h-4" />
-                {recipe.time}
+                20 min
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Users className="w-4 h-4" />
-                {recipe.servings} servings
+                2 servings
               </div>
             </div>
 
             {/* Calories */}
             <div className="bg-secondary/50 rounded-xl p-4 mb-4">
               <div className="text-center">
-                <span className="text-3xl font-semibold text-foreground">{recipe.calories}</span>
+                <span className="text-3xl font-semibold text-foreground">{recipe.calories || 0}</span>
                 <span className="text-muted-foreground ml-1">cal</span>
               </div>
             </div>
@@ -209,37 +208,48 @@ export default function RecipeDetail() {
 
             <TabsContent value="ingredients" className="mt-4">
               <div className="space-y-3">
-                {recipe.ingredients.map((ingredient, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="flex items-center gap-3 bg-card rounded-xl p-3 border border-border/50"
-                  >
-                    <div className="w-2 h-2 bg-foreground rounded-full" />
-                    <span className="text-foreground">{ingredient}</span>
-                  </motion.div>
-                ))}
+                {ingredients.length > 0 ? (
+                  ingredients.map((ingredient, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="flex items-center justify-between bg-card rounded-xl p-3 border border-border/50"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-foreground rounded-full" />
+                        <span className="text-foreground">{ingredient.item}</span>
+                      </div>
+                      <span className="text-sm text-muted-foreground">{ingredient.amount}</span>
+                    </motion.div>
+                  ))
+                ) : (
+                  <p className="text-center text-muted-foreground py-4">No ingredients listed</p>
+                )}
               </div>
             </TabsContent>
 
             <TabsContent value="method" className="mt-4">
               <div className="space-y-4">
-                {recipe.method.map((step, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="flex gap-4"
-                  >
-                    <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-sm font-medium text-foreground">{index + 1}</span>
-                    </div>
-                    <p className="text-foreground pt-1">{step}</p>
-                  </motion.div>
-                ))}
+                {methodSteps.length > 0 ? (
+                  methodSteps.map((step, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="flex gap-4"
+                    >
+                      <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-sm font-medium text-foreground">{index + 1}</span>
+                      </div>
+                      <p className="text-foreground pt-1">{step.replace(/^\d+\.\s*/, '')}</p>
+                    </motion.div>
+                  ))
+                ) : (
+                  <p className="text-center text-muted-foreground py-4">No method available</p>
+                )}
               </div>
             </TabsContent>
           </Tabs>

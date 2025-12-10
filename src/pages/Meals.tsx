@@ -1,33 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MobileLayout } from "@/components/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronRight, ChevronLeft, Search, Plus, Share2, Mail, MessageCircle, GripVertical } from "lucide-react";
+import { ChevronRight, ChevronLeft, Search, GripVertical, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
-interface Meal {
+interface MealPlan {
   id: string;
-  title: string;
-  image: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  category: string;
+  name: string;
+  description: string | null;
+  calories: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fats_g: number | null;
+  fibre_g: number | null;
+  image_url: string | null;
+  meal_type: string | null;
+  recipe_instructions: string | null;
+  ingredients: any;
 }
-
-const mockMeals: Meal[] = [
-  { id: "1", title: "Avocado Toast with Eggs", image: "", calories: 420, protein: 18, carbs: 35, fat: 24, category: "breakfast" },
-  { id: "2", title: "Greek Yogurt Parfait", image: "", calories: 280, protein: 15, carbs: 40, fat: 8, category: "breakfast" },
-  { id: "3", title: "Grilled Chicken Salad", image: "", calories: 380, protein: 42, carbs: 12, fat: 18, category: "lunch" },
-  { id: "4", title: "Quinoa Buddha Bowl", image: "", calories: 450, protein: 16, carbs: 58, fat: 18, category: "lunch" },
-  { id: "5", title: "Salmon with Vegetables", image: "", calories: 520, protein: 45, carbs: 25, fat: 28, category: "dinner" },
-  { id: "6", title: "Turkey Stir Fry", image: "", calories: 380, protein: 35, carbs: 32, fat: 14, category: "dinner" },
-  { id: "7", title: "Protein Smoothie", image: "", calories: 220, protein: 25, carbs: 22, fat: 6, category: "snack" },
-];
 
 const mealGuides = [
   { id: "1", title: "High Protein Meals", count: 24 },
@@ -37,16 +30,39 @@ const mealGuides = [
 
 export default function Meals() {
   const navigate = useNavigate();
+  const [meals, setMeals] = useState<MealPlan[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [mealOrder, setMealOrder] = useState(["breakfast", "lunch", "dinner", "snack"]);
+  const [mealOrder] = useState(["breakfast", "lunch", "dinner", "snack"]);
+
+  useEffect(() => {
+    fetchMeals();
+  }, []);
+
+  const fetchMeals = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('meal_plans')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setMeals(data || []);
+    } catch (error) {
+      console.error('Error fetching meals:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Generate week dates
   const getWeekDates = () => {
     const dates = [];
     const start = new Date(selectedDate);
-    start.setDate(start.getDate() - start.getDay() + 1); // Start from Monday
+    start.setDate(start.getDate() - start.getDay() + 1);
     for (let i = 0; i < 7; i++) {
       const date = new Date(start);
       date.setDate(start.getDate() + i);
@@ -59,10 +75,10 @@ export default function Meals() {
   const dayNames = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
   const calorieGoal = 2000;
-  const consumedCalories = mockMeals.reduce((sum, m) => sum + m.calories, 0);
-  const totalProtein = mockMeals.reduce((sum, m) => sum + m.protein, 0);
-  const totalCarbs = mockMeals.reduce((sum, m) => sum + m.carbs, 0);
-  const totalFat = mockMeals.reduce((sum, m) => sum + m.fat, 0);
+  const consumedCalories = meals.reduce((sum, m) => sum + (m.calories || 0), 0);
+  const totalProtein = meals.reduce((sum, m) => sum + (m.protein_g || 0), 0);
+  const totalCarbs = meals.reduce((sum, m) => sum + (m.carbs_g || 0), 0);
+  const totalFat = meals.reduce((sum, m) => sum + (m.fats_g || 0), 0);
 
   const navigateWeek = (direction: number) => {
     const newDate = new Date(selectedDate);
@@ -71,12 +87,22 @@ export default function Meals() {
   };
 
   const getMealsByCategory = (category: string) => {
-    return mockMeals.filter((m) => m.category === category);
+    return meals.filter((m) => m.meal_type === category);
   };
 
   const filteredMeals = searchQuery
-    ? mockMeals.filter((m) => m.title.toLowerCase().includes(searchQuery.toLowerCase()))
-    : mockMeals;
+    ? meals.filter((m) => m.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    : meals;
+
+  if (loading) {
+    return (
+      <MobileLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+        </div>
+      </MobileLayout>
+    );
+  }
 
   if (showSearch) {
     return (
@@ -108,11 +134,15 @@ export default function Meals() {
                   className="flex items-center justify-between py-4 border-b border-border/50"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-secondary rounded-lg" />
+                    {meal.image_url ? (
+                      <img src={meal.image_url} alt={meal.name} className="w-12 h-12 rounded-lg object-cover" />
+                    ) : (
+                      <div className="w-12 h-12 bg-secondary rounded-lg" />
+                    )}
                     <div>
-                      <h4 className="font-medium text-foreground">{meal.title}</h4>
+                      <h4 className="font-medium text-foreground">{meal.name}</h4>
                       <p className="text-sm text-muted-foreground">
-                        {meal.calories} kcal - P: {meal.protein}g | C: {meal.carbs}g | F: {meal.fat}g
+                        {meal.calories} kcal - P: {meal.protein_g}g | C: {meal.carbs_g}g | F: {meal.fats_g}g
                       </p>
                     </div>
                   </div>
@@ -240,8 +270,8 @@ export default function Meals() {
 
         {/* Meals by Category */}
         {mealOrder.map((category, categoryIndex) => {
-          const meals = getMealsByCategory(category);
-          if (meals.length === 0) return null;
+          const categoryMeals = getMealsByCategory(category);
+          if (categoryMeals.length === 0) return null;
           
           return (
             <motion.div
@@ -257,19 +287,23 @@ export default function Meals() {
                   <h3 className="font-semibold text-foreground capitalize">{category}</h3>
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  {meals.reduce((sum, m) => sum + m.calories, 0)} kcal
+                  {categoryMeals.reduce((sum, m) => sum + (m.calories || 0), 0)} kcal
                 </span>
               </div>
 
               <div className="space-y-2">
-                {meals.map((meal) => (
+                {categoryMeals.map((meal) => (
                   <Link to={`/meals/recipe/${meal.id}`} key={meal.id}>
                     <div className="flex items-center gap-3 bg-card rounded-xl p-3 border border-border/50">
-                      <div className="w-16 h-16 bg-secondary rounded-lg flex-shrink-0" />
+                      {meal.image_url ? (
+                        <img src={meal.image_url} alt={meal.name} className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="w-16 h-16 bg-secondary rounded-lg flex-shrink-0" />
+                      )}
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-foreground truncate">{meal.title}</h4>
+                        <h4 className="font-medium text-foreground truncate">{meal.name}</h4>
                         <p className="text-sm text-muted-foreground">
-                          {meal.calories} kcal | P: {meal.protein}g C: {meal.carbs}g F: {meal.fat}g
+                          {meal.calories} kcal | P: {meal.protein_g}g C: {meal.carbs_g}g F: {meal.fats_g}g
                         </p>
                       </div>
                       <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
@@ -280,6 +314,13 @@ export default function Meals() {
             </motion.div>
           );
         })}
+
+        {meals.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No meal plans available yet.</p>
+            <p className="text-sm text-muted-foreground mt-2">Check back soon!</p>
+          </div>
+        )}
 
         {/* Change Meal Plan Button */}
         <Button variant="outline" className="w-full">

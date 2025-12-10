@@ -25,7 +25,7 @@ const menuItems = [
   { icon: User, label: "My Account", description: "Update your personal information", link: "/profile/account" },
   { icon: Settings, label: "Settings", description: "Update settings and preferences", link: "/profile/settings" },
   { icon: CircleDot, label: "Update My Macros", description: "Update your goal, restrictions and calories", link: "/profile/macros" },
-  { icon: ImageIcon, label: "My Progress", description: "Compare your progress pictures", link: "/profile/progress" },
+  { icon: ImageIcon, label: "My Progress", description: "Compare your progress pictures", link: "/profile/photos" },
   { icon: Podcast, label: "Podcasts", description: "Listen to behind the scenes updates", link: "#" },
   { icon: Facebook, label: "Join Our Facebook Group", description: "Share your journey with the community", link: "#" },
   { icon: MessageCircle, label: "Chat With Us", description: "Get in touch with us now", link: "/profile/help" },

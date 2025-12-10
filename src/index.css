@@ -13,8 +13,8 @@
     --olive: 75 18% 55%;
     --olive-dark: 75 18% 45%;
     
-    /* CULT Fitness palette - rose gold #dabfac and nude #f8e4db */
-    --background: 18 58% 96%;
+    /* CULT Fitness palette - rose gold #dabfac background */
+    --background: 25 37% 76%;
     --foreground: 30 15% 15%;
 
     --card: 35 25% 98%;
@@ -132,7 +132,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif tracking-tight;
+    @apply font-serif tracking-tight uppercase;
   }
 }
 

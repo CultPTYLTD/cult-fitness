@@ -10,6 +10,9 @@ import Meals from "./pages/Meals";
 import RecipeDetail from "./pages/RecipeDetail";
 import Tracking from "./pages/Tracking";
 import Goals from "./pages/Goals";
+import Profile from "./pages/Profile";
+import Programs from "./pages/Programs";
+import OnDemand from "./pages/OnDemand";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +31,9 @@ const App = () => (
           <Route path="/meals/recipe/:id" element={<RecipeDetail />} />
           <Route path="/tracking" element={<Tracking />} />
           <Route path="/goals" element={<Goals />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/programs" element={<Programs />} />
+          <Route path="/on-demand" element={<OnDemand />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -82,7 +82,7 @@ export default function Profile() {
             <p className="text-muted-foreground text-sm">4 Weeks</p>
           </div>
           <Link to="/programs">
-            <Button variant="olive" className="w-full rounded-full justify-between">
+            <Button variant="default" className="w-full rounded-full justify-between bg-foreground text-background hover:bg-foreground/90">
               Change Program
               <ChevronRight className="w-5 h-5" />
             </Button>

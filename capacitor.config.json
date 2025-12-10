@@ -1,0 +1,14 @@
+{
+  "appId": "app.lovable.ec06ba7539e14b36906b3426f601a7d5",
+  "appName": "CULT Fitness",
+  "webDir": "dist",
+  "server": {
+    "url": "https://ec06ba75-39e1-4b36-906b-3426f601a7d5.lovableproject.com?forceHideBadge=true",
+    "cleartext": true
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}

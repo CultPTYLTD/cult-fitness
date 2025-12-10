@@ -1,6 +1,6 @@
 import { MobileLayout } from "@/components/MobileLayout";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Check, Crown } from "lucide-react";
+import { ArrowLeft, Check, Crown, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,42 +9,31 @@ import { useState } from "react";
 
 const plans = [
   {
-    id: "basic",
-    name: "Basic",
-    price: 199,
+    id: "monthly",
+    name: "Monthly",
+    price: 250,
     period: "month",
     features: [
       "Access to all workouts",
-      "Basic meal plans",
-      "Goal tracking",
+      "Full meal plan library",
+      "Goal tracking & analytics",
       "Progress photos",
+      "Community access",
     ],
   },
   {
-    id: "premium",
-    name: "Premium",
-    price: 399,
-    period: "month",
+    id: "annual",
+    name: "Annual",
+    price: 2000,
+    period: "year",
     popular: true,
+    savings: "Save R1,000",
     features: [
-      "Everything in Basic",
-      "Personalized meal plans",
-      "1-on-1 coaching support",
-      "Advanced analytics",
+      "Everything in Monthly",
+      "2 months FREE",
       "Priority support",
-    ],
-  },
-  {
-    id: "platinum",
-    name: "Platinum",
-    price: 699,
-    period: "month",
-    features: [
-      "Everything in Premium",
-      "Live group sessions",
-      "Nutrition consultation",
-      "Custom workout programs",
-      "VIP community access",
+      "Exclusive challenges",
+      "Early access to new features",
     ],
   },
 ];
@@ -136,12 +125,13 @@ export default function Subscribe() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 + index * 0.1 }}
                 className={`relative bg-card rounded-2xl p-6 border ${
-                  plan.popular ? "border-foreground" : "border-border"
+                  plan.popular ? "border-foreground border-2" : "border-border"
                 }`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-foreground text-background text-xs px-3 py-1 rounded-full">
-                    Most Popular
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-foreground text-background text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    Best Value
                   </div>
                 )}
                 
@@ -152,6 +142,9 @@ export default function Subscribe() {
                       <span className="text-3xl font-bold text-foreground">R{plan.price}</span>
                       <span className="text-muted-foreground">/{plan.period}</span>
                     </div>
+                    {plan.savings && (
+                      <span className="text-sm text-green-600 font-medium">{plan.savings}</span>
+                    )}
                   </div>
                 </div>
 
@@ -170,7 +163,7 @@ export default function Subscribe() {
                   onClick={() => handleSubscribe(plan.id, plan.price)}
                   disabled={loading !== null}
                 >
-                  {loading === plan.id ? "Processing..." : "Subscribe"}
+                  {loading === plan.id ? "Processing..." : plan.popular ? "Get Annual" : "Get Monthly"}
                 </Button>
               </motion.div>
             ))}

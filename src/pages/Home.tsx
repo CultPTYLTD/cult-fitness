@@ -2,12 +2,19 @@ import { MobileLayout } from "@/components/MobileLayout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Heart, Footprints, Dumbbell, Timer } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import heroImage from "@/assets/hero-fitness.jpg";
 import { cn } from "@/lib/utils";
+
+const goalCards = [
+  { id: "cardio", label: "Cardio", icon: Heart, value: 0, target: 30, unit: "min", color: "from-rose-400 to-rose-500" },
+  { id: "steps", label: "Steps", icon: Footprints, value: 0, target: 8000, unit: "", color: "from-amber-400 to-orange-500" },
+  { id: "training", label: "Training", icon: Dumbbell, value: 0, target: 5, unit: "sessions", color: "from-emerald-400 to-teal-500" },
+  { id: "move", label: "Move", icon: Timer, value: 0, target: 60, unit: "min", color: "from-sky-400 to-blue-500" },
+];
 const featuredWorkouts = [{
   id: 1,
   title: "10 Minutes to Toned Arms",
@@ -158,6 +165,53 @@ export default function Home() {
                 </div>
                 <span className="text-xs text-muted-foreground">{macro.label}</span>
               </div>)}
+          </div>
+        </motion.div>
+
+        {/* Goal Tracking Cards */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mb-6"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-foreground">Daily Goals</h3>
+            <Link to="/goals">
+              <Button variant="ghost" size="sm" className="text-muted-foreground p-0">
+                <ChevronRight className="w-5 h-5" />
+              </Button>
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {goalCards.map((goal, index) => {
+              const Icon = goal.icon;
+              const progress = (goal.value / goal.target) * 100;
+              return (
+                <motion.div
+                  key={goal.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.5 + index * 0.05 }}
+                  className="bg-card rounded-2xl p-4 border border-border/50 shadow-soft"
+                >
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center mb-3 bg-gradient-to-br",
+                    goal.color
+                  )}>
+                    <Icon className="w-5 h-5 text-white" />
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-1">{goal.label}</p>
+                  <p className="text-xl font-semibold text-foreground">
+                    {goal.value}
+                    <span className="text-sm font-normal text-muted-foreground ml-1">
+                      / {goal.target} {goal.unit}
+                    </span>
+                  </p>
+                  <Progress value={progress} className="h-1.5 mt-2 bg-secondary" />
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
       </div>

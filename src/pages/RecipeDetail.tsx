@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useGoals } from "@/contexts/GoalContext";
 
 interface Ingredient {
   item: string;
@@ -31,9 +32,11 @@ interface MealPlan {
 export default function RecipeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { refreshFoodScans } = useGoals();
   const [isAdded, setIsAdded] = useState(false);
   const [recipe, setRecipe] = useState<MealPlan | null>(null);
   const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -59,11 +62,42 @@ export default function RecipeDetail() {
     }
   };
 
-  const handleAddToMeal = () => {
-    setIsAdded(true);
-    toast.success("Meal added!", {
-      description: `${recipe?.name} has been logged to your meals.`,
-    });
+  const handleAddToMeal = async () => {
+    if (!recipe) return;
+    
+    setAdding(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('Please sign in to add meals');
+        return;
+      }
+
+      const { error } = await supabase.from('food_scans').insert({
+        user_id: user.id,
+        scan_type: 'meal_plan',
+        food_name: recipe.name,
+        calories: recipe.calories,
+        protein_g: recipe.protein_g,
+        carbs_g: recipe.carbs_g,
+        fats_g: recipe.fats_g,
+        fibre_g: recipe.fibre_g,
+        serving_size: '1 serving'
+      });
+
+      if (error) throw error;
+
+      setIsAdded(true);
+      await refreshFoodScans();
+      toast.success("Meal added!", {
+        description: `${recipe.name} has been logged to your meals.`,
+      });
+    } catch (error: any) {
+      console.error('Error adding meal:', error);
+      toast.error('Failed to add meal. Please try again.');
+    } finally {
+      setAdding(false);
+    }
   };
 
   if (loading) {
@@ -258,10 +292,15 @@ export default function RecipeDetail() {
           <div className="py-6">
             <Button
               onClick={handleAddToMeal}
-              disabled={isAdded}
+              disabled={isAdded || adding}
               className="w-full bg-foreground hover:bg-foreground/80 text-background rounded-full py-6 uppercase tracking-wider"
             >
-              {isAdded ? (
+              {adding ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Adding...
+                </>
+              ) : isAdded ? (
                 <>
                   <Check className="w-5 h-5 mr-2" />
                   Added to Meals

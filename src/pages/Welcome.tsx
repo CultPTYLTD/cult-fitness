@@ -45,7 +45,7 @@ const Welcome = () => {
           .maybeSingle();
         
         if (onboarding) {
-          navigate('/');
+          navigate('/home');
         } else {
           navigate('/onboarding');
         }

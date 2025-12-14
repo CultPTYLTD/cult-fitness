@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { MobileLayout } from "@/components/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronRight, ChevronLeft, Search, GripVertical, Loader2, Camera, Plus } from "lucide-react";
+import { ChevronRight, ChevronLeft, Search, GripVertical, Loader2, Camera, Plus, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { FoodScanner } from "@/components/FoodScanner";
+import { useGoals } from "@/contexts/GoalContext";
+import { toast } from "sonner";
 
 interface MealPlan {
   id: string;
@@ -31,6 +33,7 @@ const mealGuides = [
 
 export default function Meals() {
   const navigate = useNavigate();
+  const { foodScans, refreshFoodScans, goals } = useGoals();
   const [meals, setMeals] = useState<MealPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,6 +44,7 @@ export default function Meals() {
 
   useEffect(() => {
     fetchMeals();
+    refreshFoodScans();
   }, []);
 
   const fetchMeals = async () => {
@@ -77,10 +81,25 @@ export default function Meals() {
   const dayNames = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
   const calorieGoal = 2000;
-  const consumedCalories = meals.reduce((sum, m) => sum + (m.calories || 0), 0);
-  const totalProtein = meals.reduce((sum, m) => sum + (m.protein_g || 0), 0);
-  const totalCarbs = meals.reduce((sum, m) => sum + (m.carbs_g || 0), 0);
-  const totalFat = meals.reduce((sum, m) => sum + (m.fats_g || 0), 0);
+  const scannedCalories = foodScans.reduce((sum, s) => sum + (s.calories || 0), 0);
+  const consumedCalories = scannedCalories;
+  const scannedProtein = foodScans.reduce((sum, s) => sum + (s.protein_g || 0), 0);
+  const scannedCarbs = foodScans.reduce((sum, s) => sum + (s.carbs_g || 0), 0);
+  const scannedFat = foodScans.reduce((sum, s) => sum + (s.fats_g || 0), 0);
+  const totalProtein = scannedProtein;
+  const totalCarbs = scannedCarbs;
+  const totalFat = scannedFat;
+
+  const deleteFoodScan = async (id: string) => {
+    try {
+      const { error } = await supabase.from('food_scans').delete().eq('id', id);
+      if (error) throw error;
+      toast.success('Food removed from log');
+      refreshFoodScans();
+    } catch (error) {
+      toast.error('Failed to remove food');
+    }
+  };
 
   const navigateWeek = (direction: number) => {
     const newDate = new Date(selectedDate);
@@ -165,7 +184,7 @@ export default function Meals() {
         <FoodScanner 
           open={showScanner} 
           onClose={() => setShowScanner(false)}
-          onScanComplete={() => fetchMeals()}
+          onScanComplete={() => refreshFoodScans()}
         />
 
         {/* Header */}
@@ -261,11 +280,49 @@ export default function Meals() {
           </div>
         </motion.div>
 
+        {/* Today's Food Log */}
+        {foodScans.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-6"
+          >
+            <h3 className="font-semibold text-foreground mb-3">TODAY'S FOOD LOG</h3>
+            <div className="space-y-2">
+              {foodScans.map((scan) => (
+                <div 
+                  key={scan.id} 
+                  className="flex items-center gap-3 bg-card rounded-xl p-3 border border-border/50"
+                >
+                  <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Camera className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-foreground truncate">{scan.food_name || 'Unknown Food'}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {scan.calories} kcal | P: {scan.protein_g}g C: {scan.carbs_g}g F: {scan.fats_g}g
+                    </p>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => deleteFoodScan(scan.id)}
+                    className="flex-shrink-0 text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         {/* Meal Guides */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.25 }}
           className="mb-6"
         >
           <h3 className="font-semibold text-foreground mb-3">MEAL GUIDES & RECIPES</h3>

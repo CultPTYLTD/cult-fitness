@@ -3,7 +3,31 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
+import { Dumbbell, Utensils, Target, TrendingUp } from 'lucide-react';
 import heroImage from '@/assets/hero-fitness.jpg';
+
+const features = [
+  {
+    icon: Dumbbell,
+    title: 'Personalized Workouts',
+    description: 'Custom programs tailored to your goals and fitness level'
+  },
+  {
+    icon: Utensils,
+    title: 'Nutrition Plans',
+    description: 'Delicious meal plans with macro tracking'
+  },
+  {
+    icon: Target,
+    title: 'Goal Tracking',
+    description: 'Track water, steps, sleep and calories daily'
+  },
+  {
+    icon: TrendingUp,
+    title: 'Progress Photos',
+    description: 'Document your transformation journey'
+  }
+];
 
 const Welcome = () => {
   const navigate = useNavigate();
@@ -40,53 +64,89 @@ const Welcome = () => {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Background Image */}
+    <div className="min-h-screen flex flex-col">
+      {/* Hero Section */}
       <div 
-        className="absolute inset-0 bg-cover bg-center"
+        className="h-[45vh] bg-cover bg-center relative"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/80" />
-      </div>
-
-      {/* Content */}
-      <div className="relative min-h-screen flex flex-col justify-end p-6 pb-12">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="space-y-6"
-        >
-          <div className="space-y-2">
-            <h1 className="text-4xl font-serif font-bold text-white tracking-wide">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-background" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h1 className="text-4xl font-serif font-bold text-white tracking-wide mb-2">
               CULT FITNESS
             </h1>
-            <p className="text-lg text-white/80">
+            <p className="text-lg text-white/90">
               Transform your body. Elevate your mind.
             </p>
-          </div>
+          </motion.div>
+        </div>
+      </div>
 
-          <p className="text-white/70 text-sm leading-relaxed">
-            Personalized workouts, meal plans, and expert guidance designed to help you achieve your fitness goals.
-          </p>
+      {/* Features Section */}
+      <div className="flex-1 bg-background px-6 py-8 -mt-8 rounded-t-3xl relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+        >
+          <h2 className="text-xl font-semibold text-foreground text-center mb-6">
+            Everything you need to reach your goals
+          </h2>
 
-          <div className="space-y-3 pt-4">
-            <Button 
-              className="w-full py-6 text-lg font-semibold bg-white text-black hover:bg-white/90"
-              onClick={() => navigate('/auth')}
-            >
-              GET STARTED
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              className="w-full py-6 text-lg font-semibold border-white/30 text-white hover:bg-white/10"
-              onClick={() => navigate('/auth?mode=login')}
-            >
-              I ALREADY HAVE AN ACCOUNT
-            </Button>
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 + index * 0.1, duration: 0.4 }}
+                className="bg-secondary/50 rounded-2xl p-4 text-center"
+              >
+                <div className="w-12 h-12 rounded-full bg-background flex items-center justify-center mx-auto mb-3">
+                  <feature.icon className="w-6 h-6 text-foreground" />
+                </div>
+                <h3 className="font-semibold text-foreground text-sm mb-1">
+                  {feature.title}
+                </h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {feature.description}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
+
+        {/* CTA Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+          className="space-y-3"
+        >
+          <Button 
+            className="w-full py-6 text-lg font-semibold"
+            onClick={() => navigate('/auth')}
+          >
+            GET STARTED
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="w-full py-6 text-lg font-semibold"
+            onClick={() => navigate('/auth?mode=login')}
+          >
+            I ALREADY HAVE AN ACCOUNT
+          </Button>
+        </motion.div>
+
+        <p className="text-center text-xs text-muted-foreground mt-6">
+          By continuing, you agree to our Terms of Service and Privacy Policy
+        </p>
       </div>
     </div>
   );

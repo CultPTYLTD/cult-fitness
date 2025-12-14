@@ -82,12 +82,20 @@ export const BarcodeScanner = ({ open, onClose, onScan }: BarcodeScannerProps) =
       const cameraId = backCamera?.id || cameras[cameras.length - 1].id;
       console.log('Using camera:', cameraId);
 
+      const config: any = {
+        fps: 15,
+        qrbox: { width: 280, height: 140 },
+        aspectRatio: 0.75,
+        disableFlip: true,
+        experimentalFeatures: {
+          useBarCodeDetectorIfSupported: true,
+        },
+      };
+
       await scanner.start(
         cameraId,
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 100 },
-        },
+        config,
+
         (decodedText) => {
           if (hasScannedRef.current) return;
           hasScannedRef.current = true;

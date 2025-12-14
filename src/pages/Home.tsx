@@ -32,19 +32,26 @@ const featuredWorkouts = [
   }
 ];
 
-const macros = [
-  { label: "Protein", value: 0, target: 130 },
-  { label: "Fats", value: 0, target: 65 },
-  { label: "Carbs", value: 0, target: 200 },
-  { label: "Fibre", value: 0, target: 30 },
-];
 
 export default function Home() {
   const navigate = useNavigate();
-  const { goals } = useGoals();
+  const { goals, foodScans } = useGoals();
   const [activeTab, setActiveTab] = useState<"program" | "ondemand">("program");
   const [activeSlide, setActiveSlide] = useState(0);
   const [activeModal, setActiveModal] = useState<"water" | "steps" | "sleep" | null>(null);
+
+  // Calculate macros from food scans
+  const totalProtein = foodScans.reduce((sum, s) => sum + (s.protein_g || 0), 0);
+  const totalFat = foodScans.reduce((sum, s) => sum + (s.fats_g || 0), 0);
+  const totalCarbs = foodScans.reduce((sum, s) => sum + (s.carbs_g || 0), 0);
+  const totalFibre = foodScans.reduce((sum, s) => sum + ((s as any).fibre_g || 0), 0);
+
+  const macros = [
+    { label: "Protein", value: totalProtein, target: 130 },
+    { label: "Fats", value: totalFat, target: 65 },
+    { label: "Carbs", value: totalCarbs, target: 200 },
+    { label: "Fibre", value: totalFibre, target: 30 },
+  ];
   
   // Goal tracker items with background images
   const goalTrackerItems = [
@@ -74,8 +81,8 @@ export default function Home() {
     },
   ];
 
-  // Calculate consumed calories (mock data - this would come from meals eaten)
-  const consumedCalories = 1250;
+  // Calculate consumed calories from food scans
+  const consumedCalories = goals.calories;
   const targetCalories = 2360;
   const calorieProgress = (consumedCalories / targetCalories) * 100;
 

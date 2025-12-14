@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Check } from 'lucide-react';
+import { ChevronLeft, Check, MapPin, Sparkles, Clock, ClipboardList, Moon, Dumbbell, Flame, Zap, AlarmClock, Weight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import heroImage from '@/assets/hero-fitness.jpg';
@@ -13,30 +13,65 @@ interface QuizStep {
   question: string;
   subtitle?: string;
   type: 'single' | 'multi';
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; icon?: React.ReactNode }[];
 }
 
 const quizSteps: QuizStep[] = [
   {
+    id: 'pregnant',
+    question: 'Are you Currently Pregnant or Post-Partum?',
+    type: 'single',
+    options: [
+      { value: 'pregnant', label: 'Pregnant' },
+      { value: 'post_partum', label: 'Post-Partum' },
+      { value: 'no', label: 'No' },
+    ],
+  },
+  {
     id: 'goal',
-    question: 'WHAT IS YOUR PRIMARY TRAINING GOAL?',
+    question: 'What is your Primary Fitness Goal?',
     subtitle: 'This will help us tailor your program options',
     type: 'single',
     options: [
-      { value: 'fat_loss', label: 'FAT LOSS' },
-      { value: 'increase_strength', label: 'INCREASE STRENGTH' },
-      { value: 'improve_fitness', label: 'IMPROVE FITNESS' },
-      { value: 'gain_muscle', label: 'GAIN MUSCLE' },
+      { value: 'build_muscle', label: 'Build Muscle', icon: <Dumbbell className="w-5 h-5" /> },
+      { value: 'lose_weight', label: 'Lose Weight', icon: <Flame className="w-5 h-5" /> },
+      { value: 'improve_performance', label: 'Improve Performance', icon: <Zap className="w-5 h-5" /> },
+      { value: 'fit_lifestyle', label: 'Fit Your Lifestyle', icon: <AlarmClock className="w-5 h-5" /> },
+      { value: 'build_muscle_lose_weight', label: 'Build Muscle & Lose Weight', icon: <Weight className="w-5 h-5" /> },
+    ],
+  },
+  {
+    id: 'struggle',
+    question: 'What is your Biggest Fitness Struggle?',
+    type: 'single',
+    options: [
+      { value: 'knowing_where_to_start', label: 'Knowing Where to Start', icon: <MapPin className="w-5 h-5" /> },
+      { value: 'lacking_confidence', label: 'Lacking Confidence', icon: <Sparkles className="w-5 h-5" /> },
+      { value: 'finding_time', label: 'Finding Time to Workout', icon: <Clock className="w-5 h-5" /> },
+      { value: 'staying_consistent', label: 'Staying Consistent', icon: <ClipboardList className="w-5 h-5" /> },
+      { value: 'getting_bored', label: 'Getting Bored With Current Training', icon: <Moon className="w-5 h-5" /> },
     ],
   },
   {
     id: 'experience',
-    question: 'WHAT IS YOUR TRAINING EXPERIENCE LEVEL?',
+    question: 'What is your Current Fitness Level?',
     type: 'single',
     options: [
-      { value: 'advanced', label: 'ADVANCED (3+ YRS)' },
-      { value: 'intermediate', label: 'INTERMEDIATE (1-3 YRS)' },
-      { value: 'beginner', label: 'BEGINNER (<1 YR)' },
+      { value: 'brand_new', label: 'Brand New To Fitness' },
+      { value: 'getting_back', label: 'Getting Back Into It' },
+      { value: 'some_experience', label: 'Some Training Experience' },
+      { value: 'confident', label: 'Confident In The Gym' },
+    ],
+  },
+  {
+    id: 'training_style',
+    question: 'What is your Favourite Style of Training?',
+    type: 'single',
+    options: [
+      { value: 'weighted', label: 'Weighted Workouts', icon: <Dumbbell className="w-5 h-5" /> },
+      { value: 'pilates', label: 'Pilates' },
+      { value: 'running', label: 'Running' },
+      { value: 'hiit', label: 'High Intensity Interval Training', icon: <Flame className="w-5 h-5" /> },
     ],
   },
   {
@@ -53,13 +88,13 @@ const quizSteps: QuizStep[] = [
   },
   {
     id: 'days',
-    question: 'HOW MANY DAYS PER WEEK CAN YOU TRAIN?',
+    question: 'How Many Days Per Week Can You Train?',
     type: 'single',
     options: [
-      { value: '2', label: '2 DAYS' },
-      { value: '3', label: '3 DAYS' },
-      { value: '4', label: '4 DAYS' },
-      { value: '5', label: '5+ DAYS' },
+      { value: '2', label: '2 Days' },
+      { value: '3', label: '3 Days' },
+      { value: '4', label: '4 Days' },
+      { value: '5', label: '5+ Days' },
     ],
   },
 ];
@@ -121,7 +156,6 @@ const Onboarding = () => {
     if (currentStep < quizSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Submit answers
       await submitOnboarding();
     }
   };
@@ -135,15 +169,26 @@ const Onboarding = () => {
   const getRecommendedPlan = () => {
     const goal = answers.goal as string;
     const experience = answers.experience as string;
+    const pregnant = answers.pregnant as string;
+    const trainingStyle = answers.training_style as string;
     
-    if (goal === 'fat_loss') {
-      return experience === 'beginner' ? 'Fat Loss Fundamentals' : 'Advanced Fat Burner';
+    if (pregnant === 'pregnant') {
+      return 'Pregnancy Fitness';
     }
-    if (goal === 'gain_muscle') {
-      return experience === 'beginner' ? 'Muscle Building Basics' : 'Glute Builder';
+    if (pregnant === 'post_partum') {
+      return 'Post-Partum Recovery';
     }
-    if (goal === 'increase_strength') {
-      return 'Strength Foundation';
+    if (trainingStyle === 'pilates') {
+      return 'Pilates Fundamentals';
+    }
+    if (trainingStyle === 'hiit') {
+      return 'HIIT Fat Burner';
+    }
+    if (goal === 'lose_weight' || goal === 'build_muscle_lose_weight') {
+      return experience === 'brand_new' ? 'Fat Loss Fundamentals' : 'Advanced Fat Burner';
+    }
+    if (goal === 'build_muscle') {
+      return experience === 'brand_new' ? 'Muscle Building Basics' : 'Glute Builder';
     }
     return 'General Fitness';
   };
@@ -229,7 +274,7 @@ const Onboarding = () => {
             className="space-y-6 mt-4"
           >
             <div>
-              <h2 className="text-lg font-semibold text-primary">
+              <h2 className="text-xl font-serif text-foreground">
                 {currentQuiz.question}
               </h2>
               {currentQuiz.subtitle && (
@@ -250,24 +295,25 @@ const Onboarding = () => {
                       ? handleMultiSelect(option.value) 
                       : handleSingleSelect(option.value)
                     }
-                    className={`w-full p-4 rounded-xl border-2 text-left transition-all flex items-center justify-between ${
+                    className={`w-full p-4 rounded-xl text-left transition-all flex items-center gap-3 ${
                       isSelected 
-                        ? 'border-primary bg-primary/5' 
-                        : 'border-border hover:border-primary/50'
+                        ? 'bg-secondary border-2 border-foreground' 
+                        : 'bg-secondary/50 border-2 border-transparent hover:bg-secondary'
                     }`}
                   >
-                    <span className={`font-medium ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+                    {option.icon && (
+                      <span className="text-foreground">{option.icon}</span>
+                    )}
+                    <span className={`flex-1 font-medium ${isSelected ? 'text-foreground' : 'text-foreground'}`}>
                       {option.label}
                     </span>
                     {currentQuiz.type === 'multi' ? (
                       <Checkbox checked={isSelected} />
                     ) : isSelected ? (
-                      <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                        <Check className="w-3 h-3 text-primary-foreground" />
+                      <div className="w-5 h-5 rounded-full bg-foreground flex items-center justify-center">
+                        <Check className="w-3 h-3 text-background" />
                       </div>
-                    ) : (
-                      <div className="w-5 h-5 rounded-full border-2 border-border" />
-                    )}
+                    ) : null}
                   </button>
                 );
               })}
@@ -278,20 +324,13 @@ const Onboarding = () => {
 
       {/* Footer */}
       <div className="p-6 bg-background border-t border-border">
-        <div className="flex gap-3">
-          {currentStep > 0 && (
-            <Button variant="outline" onClick={handleBack} className="flex-1">
-              PREVIOUS
-            </Button>
-          )}
-          <Button 
-            onClick={handleNext} 
-            disabled={!canProceed() || loading}
-            className="flex-1"
-          >
-            {loading ? 'SAVING...' : currentStep === quizSteps.length - 1 ? 'SEE MY PLAN' : 'SELECT YOUR EXPERIENCE LEVEL'}
-          </Button>
-        </div>
+        <Button 
+          onClick={handleNext} 
+          disabled={!canProceed() || loading}
+          className="w-full py-6"
+        >
+          {loading ? 'SAVING...' : currentStep === quizSteps.length - 1 ? 'SEE MY PLAN' : 'CONTINUE'}
+        </Button>
         
         <p className="text-center text-xs text-muted-foreground mt-4">
           We use this information to create personalized daily recommendations tailored to your goals.

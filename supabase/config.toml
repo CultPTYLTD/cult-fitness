@@ -1,5 +1,8 @@
 project_id = "bbtkxczusjblbuneyyyt"
 
+[functions.analyze-food]
+verify_jwt = true
+
 [functions.payfast-checkout]
 verify_jwt = true
 

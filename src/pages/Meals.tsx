@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { MobileLayout } from "@/components/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronRight, ChevronLeft, Search, GripVertical, Loader2 } from "lucide-react";
+import { ChevronRight, ChevronLeft, Search, GripVertical, Loader2, Camera, Plus } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { FoodScanner } from "@/components/FoodScanner";
 
 interface MealPlan {
   id: string;
@@ -36,6 +37,7 @@ export default function Meals() {
   const [showSearch, setShowSearch] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [mealOrder] = useState(["breakfast", "lunch", "dinner", "snack"]);
+  const [showScanner, setShowScanner] = useState(false);
 
   useEffect(() => {
     fetchMeals();
@@ -159,6 +161,13 @@ export default function Meals() {
   return (
     <MobileLayout>
       <div className="px-4 pt-12 pb-8">
+        {/* Food Scanner Modal */}
+        <FoodScanner 
+          open={showScanner} 
+          onClose={() => setShowScanner(false)}
+          onScanComplete={() => fetchMeals()}
+        />
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <motion.h1
@@ -168,9 +177,14 @@ export default function Meals() {
           >
             MEALS
           </motion.h1>
-          <Button variant="ghost" size="icon" onClick={() => setShowSearch(true)}>
-            <Search className="w-5 h-5" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => setShowScanner(true)}>
+              <Camera className="w-5 h-5" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => setShowSearch(true)}>
+              <Search className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
 
         {/* Week Navigation */}

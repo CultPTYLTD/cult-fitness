@@ -2,7 +2,8 @@ import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Camera, Barcode, Loader2, X, Check, ScanLine } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { Camera, Barcode, Loader2, X, Check, ScanLine, Minus, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -26,12 +27,14 @@ interface FoodScannerProps {
 }
 
 export const FoodScanner = ({ open, onClose, onScanComplete }: FoodScannerProps) => {
-  const [mode, setMode] = useState<'select' | 'camera' | 'barcode' | 'barcode-manual'>('select');
+  const [mode, setMode] = useState<'select' | 'camera' | 'barcode' | 'barcode-manual' | 'result'>('select');
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [barcode, setBarcode] = useState('');
   const [result, setResult] = useState<FoodScanResult | null>(null);
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
+  const [servings, setServings] = useState(1);
+  const [scanType, setScanType] = useState<'photo' | 'barcode'>('photo');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,6 +52,7 @@ export const FoodScanner = ({ open, onClose, onScanComplete }: FoodScannerProps)
     if (!preview) return;
     
     setLoading(true);
+    setScanType('photo');
     try {
       const { data, error } = await supabase.functions.invoke('analyze-food', {
         body: { imageBase64: preview }
@@ -62,6 +66,8 @@ export const FoodScanner = ({ open, onClose, onScanComplete }: FoodScannerProps)
       }
 
       setResult(data);
+      setMode('result');
+      setServings(1);
     } catch (error: any) {
       console.error('Error analyzing image:', error);
       toast.error('Failed to analyze food. Please try again.');
@@ -77,6 +83,8 @@ export const FoodScanner = ({ open, onClose, onScanComplete }: FoodScannerProps)
     }
     
     setLoading(true);
+    setScanType('barcode');
+    setMode('barcode');
     try {
       const { data, error } = await supabase.functions.invoke('analyze-food', {
         body: { barcode: code.trim() }
@@ -86,22 +94,31 @@ export const FoodScanner = ({ open, onClose, onScanComplete }: FoodScannerProps)
       
       if (data.error) {
         toast.error(data.error);
+        setMode('select');
         return;
       }
 
       setResult(data);
+      setMode('result');
+      setServings(1);
     } catch (error: any) {
       console.error('Error analyzing barcode:', error);
       toast.error('Failed to look up barcode. Please try again.');
+      setMode('select');
     } finally {
       setLoading(false);
     }
   };
 
   const handleBarcodeScan = (scannedCode: string) => {
+    console.log('Barcode scanned:', scannedCode);
     setBarcode(scannedCode);
     setShowBarcodeScanner(false);
     analyzeBarcode(scannedCode);
+  };
+
+  const getAdjustedValue = (value: number) => {
+    return Math.round(value * servings);
   };
 
   const saveResult = async () => {
@@ -116,21 +133,28 @@ export const FoodScanner = ({ open, onClose, onScanComplete }: FoodScannerProps)
 
       const { error } = await supabase.from('food_scans').insert({
         user_id: user.id,
-        scan_type: mode === 'camera' ? 'photo' : 'barcode',
+        scan_type: scanType,
         food_name: result.food_name,
-        calories: result.calories,
-        protein_g: result.protein_g,
-        carbs_g: result.carbs_g,
-        fats_g: result.fats_g,
-        fibre_g: result.fibre_g,
-        serving_size: result.serving_size,
-        barcode: mode === 'barcode' || mode === 'barcode-manual' ? barcode : null
+        calories: getAdjustedValue(result.calories),
+        protein_g: getAdjustedValue(result.protein_g),
+        carbs_g: getAdjustedValue(result.carbs_g),
+        fats_g: getAdjustedValue(result.fats_g),
+        fibre_g: result.fibre_g ? getAdjustedValue(result.fibre_g) : null,
+        serving_size: `${servings} × ${result.serving_size || 'serving'}`,
+        barcode: scanType === 'barcode' ? barcode : null
       });
 
       if (error) throw error;
       
       toast.success('Food added to your log!');
-      onScanComplete(result);
+      onScanComplete({
+        ...result,
+        calories: getAdjustedValue(result.calories),
+        protein_g: getAdjustedValue(result.protein_g),
+        carbs_g: getAdjustedValue(result.carbs_g),
+        fats_g: getAdjustedValue(result.fats_g),
+        fibre_g: result.fibre_g ? getAdjustedValue(result.fibre_g) : undefined
+      });
       handleReset();
       onClose();
     } catch (error: any) {
@@ -145,6 +169,11 @@ export const FoodScanner = ({ open, onClose, onScanComplete }: FoodScannerProps)
     setBarcode('');
     setResult(null);
     setLoading(false);
+    setServings(1);
+  };
+
+  const adjustServings = (delta: number) => {
+    setServings(prev => Math.max(0.25, Math.min(10, prev + delta)));
   };
 
   return (
@@ -153,12 +182,12 @@ export const FoodScanner = ({ open, onClose, onScanComplete }: FoodScannerProps)
         <DialogContent className="max-w-md mx-auto">
           <DialogHeader>
             <DialogTitle className="text-center font-serif">
-              {result ? 'Nutrition Info' : mode === 'select' ? 'Scan Food' : mode === 'camera' ? 'Take Photo' : 'Scan Barcode'}
+              {mode === 'result' ? 'Nutrition Info' : mode === 'select' ? 'Scan Food' : mode === 'camera' ? 'Take Photo' : 'Scan Barcode'}
             </DialogTitle>
           </DialogHeader>
 
           <AnimatePresence mode="wait">
-            {result ? (
+            {mode === 'result' && result ? (
               <motion.div
                 key="result"
                 initial={{ opacity: 0, y: 10 }}
@@ -169,25 +198,60 @@ export const FoodScanner = ({ open, onClose, onScanComplete }: FoodScannerProps)
                 <div className="text-center">
                   <h3 className="text-xl font-semibold text-foreground">{result.food_name}</h3>
                   {result.serving_size && (
-                    <p className="text-sm text-muted-foreground">{result.serving_size}</p>
+                    <p className="text-sm text-muted-foreground">Per serving: {result.serving_size}</p>
                   )}
                 </div>
 
+                {/* Serving Size Adjuster */}
+                <div className="bg-secondary/50 rounded-xl p-4">
+                  <p className="text-sm text-muted-foreground text-center mb-3">How much are you eating?</p>
+                  <div className="flex items-center justify-center gap-4">
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      onClick={() => adjustServings(-0.25)}
+                      disabled={servings <= 0.25}
+                    >
+                      <Minus className="w-4 h-4" />
+                    </Button>
+                    <div className="text-center min-w-[80px]">
+                      <span className="text-2xl font-bold text-foreground">{servings}</span>
+                      <p className="text-xs text-muted-foreground">serving{servings !== 1 ? 's' : ''}</p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      onClick={() => adjustServings(0.25)}
+                      disabled={servings >= 10}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <Slider
+                    value={[servings]}
+                    onValueChange={([val]) => setServings(val)}
+                    min={0.25}
+                    max={5}
+                    step={0.25}
+                    className="mt-3"
+                  />
+                </div>
+
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-secondary rounded-xl p-4 text-center">
-                    <span className="text-2xl font-bold text-foreground">{result.calories}</span>
+                  <div className="bg-primary/10 rounded-xl p-4 text-center">
+                    <span className="text-2xl font-bold text-primary">{getAdjustedValue(result.calories)}</span>
                     <p className="text-xs text-muted-foreground">CALORIES</p>
                   </div>
                   <div className="bg-secondary rounded-xl p-4 text-center">
-                    <span className="text-2xl font-bold text-foreground">{result.protein_g}g</span>
+                    <span className="text-2xl font-bold text-foreground">{getAdjustedValue(result.protein_g)}g</span>
                     <p className="text-xs text-muted-foreground">PROTEIN</p>
                   </div>
                   <div className="bg-secondary rounded-xl p-4 text-center">
-                    <span className="text-2xl font-bold text-foreground">{result.carbs_g}g</span>
+                    <span className="text-2xl font-bold text-foreground">{getAdjustedValue(result.carbs_g)}g</span>
                     <p className="text-xs text-muted-foreground">CARBS</p>
                   </div>
                   <div className="bg-secondary rounded-xl p-4 text-center">
-                    <span className="text-2xl font-bold text-foreground">{result.fats_g}g</span>
+                    <span className="text-2xl font-bold text-foreground">{getAdjustedValue(result.fats_g)}g</span>
                     <p className="text-xs text-muted-foreground">FAT</p>
                   </div>
                 </div>
@@ -223,7 +287,6 @@ export const FoodScanner = ({ open, onClose, onScanComplete }: FoodScannerProps)
                   variant="outline"
                   className="w-full h-24 flex flex-col gap-2"
                   onClick={() => {
-                    setMode('barcode');
                     setShowBarcodeScanner(true);
                   }}
                 >
@@ -327,22 +390,16 @@ export const FoodScanner = ({ open, onClose, onScanComplete }: FoodScannerProps)
               </motion.div>
             ) : (
               <motion.div
-                key="barcode"
+                key="loading"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 className="space-y-4"
               >
-                {loading ? (
-                  <div className="text-center py-8">
-                    <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
-                    <p className="text-muted-foreground">Looking up barcode...</p>
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">Opening camera scanner...</p>
-                  </div>
-                )}
+                <div className="text-center py-8">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
+                  <p className="text-muted-foreground">Looking up barcode...</p>
+                </div>
                 <Button variant="outline" className="w-full" onClick={handleReset}>
                   Cancel
                 </Button>
@@ -356,7 +413,6 @@ export const FoodScanner = ({ open, onClose, onScanComplete }: FoodScannerProps)
         open={showBarcodeScanner} 
         onClose={() => {
           setShowBarcodeScanner(false);
-          if (!barcode) handleReset();
         }}
         onScan={handleBarcodeScan}
       />

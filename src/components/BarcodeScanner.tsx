@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Camera, X, Flashlight } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 
 interface BarcodeScannerProps {
@@ -150,12 +150,12 @@ export const BarcodeScanner = ({ open, onClose, onScan }: BarcodeScannerProps) =
     <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) handleClose(); }}>
       <DialogContent className="max-w-md mx-auto p-0 overflow-hidden bg-background">
         <DialogHeader className="p-4 pb-2">
-          <DialogTitle className="text-center font-serif flex items-center justify-between">
-            <span>Scan Barcode</span>
-            <Button variant="ghost" size="icon" onClick={handleClose}>
-              <X className="w-5 h-5" />
-            </Button>
+          <DialogTitle className="text-center font-serif">
+            Scan Barcode
           </DialogTitle>
+          <DialogDescription className="text-center text-sm text-muted-foreground">
+            Hold the product barcode inside the frame until it is detected.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="p-4 pt-0">

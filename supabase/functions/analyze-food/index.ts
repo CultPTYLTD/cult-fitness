@@ -21,7 +21,7 @@ serve(async (req) => {
       if (!cleaned) {
         return new Response(
           JSON.stringify({ error: 'Invalid barcode format', food_name: 'Unknown product' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
@@ -35,7 +35,7 @@ serve(async (req) => {
         console.error('Open Food Facts HTTP error:', offResponse.status, offResponse.statusText);
         return new Response(
           JSON.stringify({ error: 'Could not reach product database', food_name: 'Unknown product' }),
-          { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
@@ -48,7 +48,7 @@ serve(async (req) => {
             error: 'Product not found for this barcode',
             food_name: 'Unknown product',
           }),
-          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 

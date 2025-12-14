@@ -3,7 +3,7 @@ import { Home, Dumbbell, UtensilsCrossed, BarChart3, Target } from "lucide-react
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { icon: Home, label: "Home", path: "/" },
+  { icon: Home, label: "Home", path: "/home" },
   { icon: Dumbbell, label: "Workouts", path: "/workouts" },
   { icon: UtensilsCrossed, label: "Meals", path: "/meals" },
   { icon: BarChart3, label: "Tracking", path: "/tracking" },

@@ -18,15 +18,36 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
-        navigate('/');
+        // Check if user has completed onboarding
+        const { data: onboarding } = await supabase
+          .from('user_onboarding')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        
+        if (onboarding) {
+          navigate('/home');
+        } else {
+          navigate('/onboarding');
+        }
       }
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
-        navigate('/');
+        const { data: onboarding } = await supabase
+          .from('user_onboarding')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        
+        if (onboarding) {
+          navigate('/home');
+        } else {
+          navigate('/onboarding');
+        }
       }
     });
 

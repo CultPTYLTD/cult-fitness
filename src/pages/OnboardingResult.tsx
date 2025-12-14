@@ -165,7 +165,7 @@ const OnboardingResult = () => {
       <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background via-background to-transparent">
         <Button 
           className="w-full py-6 text-lg font-semibold"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/home')}
         >
           GET STARTED
           <ChevronRight className="w-5 h-5 ml-2" />

@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      food_scans: {
+        Row: {
+          barcode: string | null
+          calories: number | null
+          carbs_g: number | null
+          created_at: string
+          fats_g: number | null
+          fibre_g: number | null
+          food_name: string | null
+          id: string
+          image_url: string | null
+          protein_g: number | null
+          scan_date: string | null
+          scan_type: string
+          serving_size: string | null
+          user_id: string
+        }
+        Insert: {
+          barcode?: string | null
+          calories?: number | null
+          carbs_g?: number | null
+          created_at?: string
+          fats_g?: number | null
+          fibre_g?: number | null
+          food_name?: string | null
+          id?: string
+          image_url?: string | null
+          protein_g?: number | null
+          scan_date?: string | null
+          scan_type: string
+          serving_size?: string | null
+          user_id: string
+        }
+        Update: {
+          barcode?: string | null
+          calories?: number | null
+          carbs_g?: number | null
+          created_at?: string
+          fats_g?: number | null
+          fibre_g?: number | null
+          food_name?: string | null
+          id?: string
+          image_url?: string | null
+          protein_g?: number | null
+          scan_date?: string | null
+          scan_type?: string
+          serving_size?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       meal_plans: {
         Row: {
           calories: number | null
@@ -170,6 +221,42 @@ export type Database = {
           steps?: number | null
           user_id?: string
           water_ml?: number | null
+        }
+        Relationships: []
+      }
+      user_onboarding: {
+        Row: {
+          completed_at: string | null
+          confident_lifts: string[] | null
+          created_at: string
+          experience_level: string | null
+          id: string
+          recommended_plan: string | null
+          training_days_per_week: number | null
+          training_goal: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          confident_lifts?: string[] | null
+          created_at?: string
+          experience_level?: string | null
+          id?: string
+          recommended_plan?: string | null
+          training_days_per_week?: number | null
+          training_goal?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          confident_lifts?: string[] | null
+          created_at?: string
+          experience_level?: string | null
+          id?: string
+          recommended_plan?: string | null
+          training_days_per_week?: number | null
+          training_goal?: string | null
+          user_id?: string
         }
         Relationships: []
       }

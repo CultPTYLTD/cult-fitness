@@ -25,6 +25,9 @@ import SubscriptionSuccess from "./pages/SubscriptionSuccess";
 import SubscriptionCancel from "./pages/SubscriptionCancel";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
+import Welcome from "./pages/Welcome";
+import Onboarding from "./pages/Onboarding";
+import OnboardingResult from "./pages/OnboardingResult";
 
 const queryClient = new QueryClient();
 
@@ -37,7 +40,10 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/welcome" element={<Welcome />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/onboarding/result" element={<OnboardingResult />} />
             <Route path="/workouts" element={<Workouts />} />
             <Route path="/workouts/player" element={<WorkoutPlayer />} />
             <Route path="/meals" element={<Meals />} />

@@ -1,18 +1,32 @@
 import { MobileLayout } from "@/components/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { ArrowLeft, ChevronRight, Dumbbell, Heart, User } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { ArrowLeft, ChevronRight, Dumbbell, Heart, User, Loader2, Check, Circle } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useOura } from "@/hooks/useOura";
 
 export default function Settings() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { isConnected, loading, connect, disconnect, handleOAuthCallback } = useOura();
   const [settings, setSettings] = useState({
     bodyMeasurements: "metric",
     nutritionMeasurements: "metric",
     socialSharing: false,
     emailMarketing: true
   });
+
+  // Handle Oura OAuth callback
+  useEffect(() => {
+    const code = searchParams.get('code');
+    if (code) {
+      handleOAuthCallback(code).then(() => {
+        // Clear the code from URL
+        window.history.replaceState({}, '', '/profile/settings');
+      });
+    }
+  }, [searchParams]);
 
   return (
     <MobileLayout showNav={false}>
@@ -75,6 +89,54 @@ export default function Settings() {
             </p>
           </div>
 
+          {/* Connected Devices */}
+          <div className="mb-6">
+            <h3 className="text-foreground font-semibold mb-3">Connected Devices</h3>
+            
+            {/* Oura Ring */}
+            <button 
+              className="w-full flex items-center justify-between py-3"
+              onClick={() => isConnected ? disconnect() : connect()}
+              disabled={loading}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center shadow-sm">
+                  <Circle className="w-5 h-5 text-white" />
+                </div>
+                <div className="text-left">
+                  <p className="text-foreground font-medium">Oura Ring</p>
+                  <p className="text-muted-foreground text-sm">
+                    {isConnected ? 'Connected - Tap to disconnect' : 'Sync sleep, activity & readiness'}
+                  </p>
+                </div>
+              </div>
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+              ) : isConnected ? (
+                <Check className="w-5 h-5 text-green-500" />
+              ) : (
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              )}
+            </button>
+
+            {/* Apple Health */}
+            <button 
+              className="w-full flex items-center justify-between py-3"
+              onClick={() => {/* Apple Health requires native app */}}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                  <Heart className="w-5 h-5 text-red-400" />
+                </div>
+                <div className="text-left">
+                  <p className="text-foreground font-medium">Apple Health</p>
+                  <p className="text-muted-foreground text-sm">Sync your recorded steps</p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </button>
+          </div>
+
           {/* Workout Program */}
           <div className="mb-6">
             <h3 className="text-foreground font-semibold mb-3">Workout Program</h3>
@@ -87,26 +149,6 @@ export default function Settings() {
                 <div className="text-left">
                   <p className="text-foreground font-medium">Update my program details</p>
                   <p className="text-muted-foreground text-sm">Gym • 5 days</p>
-                </div>
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </button>
-          </div>
-
-          {/* Step Tracking */}
-          <div className="mb-6">
-            <h3 className="text-foreground font-semibold mb-3">Step Tracking</h3>
-            <button 
-              className="w-full flex items-center justify-between py-3"
-              onClick={() => {/* Apple Health requires native app */}}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                  <Heart className="w-5 h-5 text-red-400" />
-                </div>
-                <div className="text-left">
-                  <p className="text-foreground font-medium">Link Apple Health</p>
-                  <p className="text-muted-foreground text-sm">Sync your recorded steps</p>
                 </div>
               </div>
               <ChevronRight className="w-5 h-5 text-muted-foreground" />

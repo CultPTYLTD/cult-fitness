@@ -63,14 +63,17 @@ export const BarcodeScanner = ({ open, onClose, onScan }: BarcodeScannerProps) =
       await scanner.start(
         cameraId,
         {
-          fps: 10,
-          qrbox: { width: 250, height: 150 },
-          aspectRatio: 1.0,
+          fps: 15,
+          qrbox: { width: 280, height: 120 },
+          aspectRatio: 1.5,
         },
         (decodedText) => {
-          onScan(decodedText);
-          stopScanner();
-          onClose();
+          console.log('Barcode detected:', decodedText);
+          // Stop scanner first to prevent multiple scans
+          scanner.stop().then(() => {
+            onScan(decodedText);
+            onClose();
+          }).catch(console.error);
         },
         () => {
           // Ignore scan errors (no code found)

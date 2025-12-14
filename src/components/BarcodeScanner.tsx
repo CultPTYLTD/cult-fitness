@@ -83,9 +83,9 @@ export const BarcodeScanner = ({ open, onClose, onScan }: BarcodeScannerProps) =
       console.log('Using camera:', cameraId);
 
       const config: any = {
-        fps: 15,
-        qrbox: { width: 280, height: 140 },
-        aspectRatio: 0.75,
+        fps: 10,
+        // Use full camera frame for more reliable 1D barcode detection
+        aspectRatio: 1.7777778,
         disableFlip: true,
         experimentalFeatures: {
           useBarCodeDetectorIfSupported: true,
